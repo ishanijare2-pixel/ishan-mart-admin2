@@ -1,811 +1,1073 @@
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ishan Mart Admin</title>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-    <style>
-      *{box-sizing:border-box}
-      body{margin:0;background:#101114;color:white;font-family:Arial,sans-serif}
-      button,input,select{font:inherit}
-      button{cursor:pointer;border:0;border-radius:8px;padding:11px 15px;font-weight:bold}
-      button:disabled{opacity:.5;cursor:not-allowed}
-      .primary{background:#d7ff45;color:#111}
-      .danger{background:#ff5555;color:white}
-      .secondary{background:#303138;color:white}
-      .success{background:#36c98b;color:#101114}
-      .warning{background:#f5b942;color:#111}
-      header{background:#191a1f;padding:18px 6%;display:flex;justify-content:space-between;align-items:center;gap:12px}
-      .logo{font-size:22px;color:#d7ff45;font-weight:900}
-      main{max-width:1150px;margin:auto;padding:25px 5%}
-      .panel{background:#191a1f;padding:22px;border-radius:14px;margin-bottom:20px}
-      input,select{width:100%;padding:12px;margin:8px 0 14px;background:#25262c;color:white;border:1px solid #444;border-radius:8px}
-      label{color:#bbb;font-size:14px}
-      h2{margin-top:0}
-      .hidden{display:none!important}
-      .nav{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:20px}
-      .nav button{background:#303138;color:white}
-      .nav button.active{background:#d7ff45;color:#111}
-      #status{color:#d7ff45;margin:12px 0}
-      .product{display:flex;align-items:center;gap:14px;border-bottom:1px solid #333;padding:15px 0;flex-wrap:wrap}
-      .product img{width:70px;height:70px;object-fit:cover;border-radius:9px;background:#303138}
-      .product-info{flex:1;min-width:150px}
-      .product-info p{color:#aaa;margin:5px 0}
-      .preview{width:110px;height:110px;object-fit:cover;border-radius:10px;display:none;margin-bottom:15px}
-      .grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-      .order-card,.request-card,.customer-card{background:#222329;border:1px solid #393a40;border-radius:12px;padding:17px;margin:14px 0}
-      .order-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-      .order-id{color:#d7ff45;font-size:12px;overflow-wrap:anywhere}
-      .order-detail{color:#bbb;line-height:1.7;margin:12px 0}
-      .order-items{border-top:1px solid #444;border-bottom:1px solid #444;padding:12px 0;margin:12px 0}
-      .order-item{display:flex;justify-content:space-between;gap:12px;padding:5px 0}
-      .order-total{color:#d7ff45;font-size:20px;font-weight:bold;margin:12px 0}
-      .small-note{color:#aaa;font-size:13px;line-height:1.5}
-      .empty{color:#aaa;padding:20px 0}
-      .stock-good{color:#d7ff45}
-      .stock-low{color:#ffb84d}
-      .stock-out{color:#ff6666}
-      .tag{display:inline-block;padding:5px 9px;border-radius:20px;background:#303138;font-size:12px;margin:3px}
-      .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-      .actions button{padding:9px 12px}
-      .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
-      .stat{background:#222329;padding:16px;border-radius:12px}
-      .stat strong{display:block;color:#d7ff45;font-size:24px;margin-top:7px}
-      @media(max-width:650px){
-       .grid{grid-template-columns:1fr}
-       .stat-grid{grid-template-columns:1fr 1fr}
-       header{padding:15px}
-       main{padding:18px 12px}
-       .panel{padding:16px}
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <div class="logo">ISHAN MART ADMIN</div>
-      <button id="logoutButton" class="secondary hidden" onclick="logout()">
-        Logout
-      </button>
-    </header>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#063f3b">
+<title>Ishan Mart</title>
 
-    <main>
-      <section id="loginSection" class="panel">
-        <h2>Admin Login</h2>
-        <p class="small-note">Login to manage Ishan Mart.</p>
-        <label>Email address</label>
-        <input id="email" type="email" placeholder="Admin email" />
-        <label>Password</label>
-        <input id="password" type="password" placeholder="Admin password" />
-        <button class="primary" onclick="login()">Login to Dashboard</button>
-        <p id="loginMessage"></p>
-      </section>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-      <section id="dashboard" class="hidden">
-        <h1>Dashboard</h1>
-        <p id="status">Connected to Ishan Mart</p>
+<style>
+:root{
+  --deep:#063f3b;
+  --deep2:#092e2b;
+  --mint:#a8f0d4;
+  --mint2:#d9fff0;
+  --bg:#f4faf7;
+  --white:#fff;
+  --text:#173a35;
+  --muted:#78918a;
+  --line:#e2eee8;
+  --red:#e65b5b;
+  --orange:#ed9b42;
+  --shadow:0 10px 35px rgba(6,63,59,.09);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  padding-bottom:95px;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+#splash{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--deep);
+  color:white;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  transition:opacity .5s;
+}
+.splash-logo{
+  width:86px;height:86px;border-radius:28px;
+  background:var(--mint);color:var(--deep);
+  display:grid;place-items:center;font-size:42px;
+  font-weight:900;box-shadow:0 15px 40px #0003;
+  animation:float 1.5s infinite ease-in-out;
+}
+#splash h1{font-family:Outfit;margin:20px 0 5px}
+#splash p{color:var(--mint);font-size:13px}
+@keyframes float{50%{transform:translateY(-8px)}}
+header{
+  background:var(--deep);color:white;
+  padding:18px 18px 25px;border-radius:0 0 28px 28px;
+}
+.topbar{display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:Outfit;font-size:23px;font-weight:800}
+.brand span{color:var(--mint)}
+.location{font-size:12px;color:#c6e8dc;margin-top:4px}
+.icon-btn{
+  border:0;background:#ffffff18;color:white;
+  width:42px;height:42px;border-radius:14px;font-size:19px;
+}
+.search-wrap{margin-top:20px;position:relative}
+.search-wrap input{
+  width:100%;padding:15px 16px 15px 45px;
+  border:0;border-radius:15px;outline:0;
+  background:#fff;color:var(--text);
+}
+.search-icon{position:absolute;left:16px;top:13px;color:#77928a}
+main{max-width:900px;margin:auto;padding:18px}
+.hero{
+  background:linear-gradient(120deg,#0b6257,#063f3b);
+  border-radius:22px;padding:22px;color:white;
+  min-height:155px;position:relative;overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.hero:after{
+  content:"🥑";position:absolute;right:22px;bottom:5px;
+  font-size:90px;opacity:.2;transform:rotate(-15deg);
+}
+.hero h2{font:700 25px Outfit;margin:0 0 8px;max-width:230px}
+.hero p{font-size:13px;color:#d1f5e7;max-width:220px}
+.hero button{
+  border:0;border-radius:12px;padding:10px 16px;
+  background:var(--mint);color:var(--deep);font-weight:800;
+}
+.section-head{
+  display:flex;justify-content:space-between;
+  align-items:center;margin:25px 0 13px;
+}
+.section-head h3{font:700 19px Outfit;margin:0}
+.section-head button{
+  border:0;background:none;color:#16806c;font-weight:700;
+}
+.categories{
+  display:flex;gap:12px;overflow-x:auto;padding:3px 1px 10px;
+}
+.cat{
+  min-width:76px;border:1px solid var(--line);
+  background:white;border-radius:17px;padding:12px 7px;
+  text-align:center;color:var(--text);
+  transition:.2s;
+}
+.cat:active{transform:scale(.94)}
+.cat .emoji{font-size:27px;display:block;animation:catFloat 2.5s infinite}
+.cat small{font-size:11px;font-weight:700}
+@keyframes catFloat{50%{transform:translateY(-3px)}}
+.products{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;
+}
+.product{
+  background:white;border:1px solid var(--line);
+  border-radius:19px;padding:10px;position:relative;
+  overflow:hidden;box-shadow:0 4px 15px #063f3b08;
+}
+.product-image{
+  width:100%;height:130px;object-fit:cover;
+  border-radius:13px;background:#edf6f1;
+}
+.product h4{margin:10px 0 4px;font-size:14px}
+.product .muted{font-size:11px;color:var(--muted)}
+.price-row{display:flex;align-items:center;gap:7px;margin-top:8px}
+.price{font-size:16px;font-weight:800;color:var(--deep)}
+.old-price{text-decoration:line-through;color:#9baaa4;font-size:11px}
+.discount{font-size:10px;color:#16805e;font-weight:800}
+.stock-label{font-size:10px;margin-top:5px;color:#16805e}
+.stock-label.low{color:#d17b24}
+.stock-label.out{color:var(--red)}
+.add-btn{
+  width:100%;margin-top:10px;border:0;border-radius:11px;
+  padding:10px;background:var(--deep);color:white;font-weight:800;
+}
+.add-btn:disabled{background:#b6c7c0;cursor:not-allowed}
+.fav{
+  position:absolute;right:17px;top:17px;
+  width:32px;height:32px;border:0;border-radius:50%;
+  background:#ffffffed;color:#73877f;font-size:17px;
+}
+.fav.active{color:#e64e69}
+.skeleton{
+  height:220px;border-radius:18px;
+  background:linear-gradient(90deg,#eaf1ed 25%,#f7fbf8 50%,#eaf1ed 75%);
+  background-size:200% 100%;animation:shine 1.2s infinite;
+}
+@keyframes shine{to{background-position:-200% 0}}
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#ffffffed;backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;
+  padding:10px 4px calc(10px + env(safe-area-inset-bottom));
+  z-index:50;
+}
+.nav-item{
+  border:0;background:none;color:#82958e;
+  font-size:10px;font-weight:700;display:flex;
+  flex-direction:column;align-items:center;gap:4px;
+}
+.nav-item span{font-size:21px}
+.nav-item.active{color:var(--deep)}
+.floating-cart{
+  position:fixed;right:18px;bottom:85px;
+  background:var(--deep);color:white;border:0;
+  border-radius:18px;padding:13px 18px;
+  box-shadow:0 8px 25px #063f3b45;z-index:40;
+  font-weight:800;
+}
+.panel{display:none}
+.panel.active{display:block;animation:appear .25s}
+@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.back-btn{
+  border:0;background:#e4f4ec;color:var(--deep);
+  border-radius:12px;padding:10px 14px;font-weight:800;
+}
+.card{
+  background:white;border:1px solid var(--line);
+  border-radius:18px;padding:16px;margin-bottom:13px;
+}
+.field{margin:12px 0}
+.field label{display:block;font-size:12px;font-weight:800;margin-bottom:6px}
+.field input,.field textarea,.field select{
+  width:100%;padding:13px;border:1px solid var(--line);
+  border-radius:12px;outline:0;background:#fbfdfb;
+}
+.field textarea{min-height:75px;resize:vertical}
+.primary{
+  background:var(--deep);color:white;border:0;
+  padding:13px 17px;border-radius:12px;font-weight:800;
+}
+.secondary{
+  background:var(--mint2);color:var(--deep);border:0;
+  padding:11px 14px;border-radius:12px;font-weight:800;
+}
+.danger{background:#fff0f0;color:#c64d4d;border:0;padding:10px 13px;border-radius:11px;font-weight:700}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.small{font-size:12px;color:var(--muted)}
+.total-line{display:flex;justify-content:space-between;margin:10px 0;font-size:13px}
+.total-line.final{font-size:18px;font-weight:900;border-top:1px solid var(--line);padding-top:13px}
+.detail-image{width:100%;height:260px;object-fit:cover;border-radius:20px;background:#eaf4ef}
+.detail-title{font:800 25px Outfit;margin:15px 0 5px}
+.stars{color:#efa82e;letter-spacing:2px}
+.timeline{margin:18px 0 8px}
+.step{display:flex;gap:12px;position:relative;padding-bottom:20px}
+.step:not(:last-child):before{
+  content:"";position:absolute;left:12px;top:27px;
+  height:calc(100% - 18px);width:2px;background:#dcebe3;
+}
+.dot{width:25px;height:25px;border-radius:50%;background:#e4eee8;z-index:1;display:grid;place-items:center;font-size:12px}
+.step.done .dot{background:var(--mint);color:var(--deep)}
+.toast{
+  position:fixed;left:50%;bottom:100px;transform:translate(-50%,20px);
+  background:#123f37;color:white;padding:12px 18px;border-radius:13px;
+  opacity:0;pointer-events:none;transition:.25s;z-index:999;
+  max-width:90%;font-size:13px;text-align:center;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.empty{text-align:center;padding:35px 15px;color:var(--muted)}
+.empty b{display:block;font-size:35px;margin-bottom:8px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap}
+.filter-row select{padding:10px;border:1px solid var(--line);border-radius:10px;background:white}
+@media(min-width:650px){
+  .products{grid-template-columns:repeat(3,minmax(0,1fr))}
+  main{padding:24px}
+  .product-image{height:165px}
+}
+</style>
+</head>
 
-        <div class="stat-grid">
-          <div class="stat">Products<strong id="productCount">0</strong></div>
-          <div class="stat">Orders<strong id="orderCount">0</strong></div>
-          <div class="stat">
-            Cancellation requests<strong id="requestCount">0</strong>
+<body>
+
+<div id="splash">
+  <div class="splash-logo">I</div>
+  <h1>ISHAN MART</h1>
+  <p>Fresh choices. Happy living.</p>
+</div>
+
+<header>
+  <div class="topbar">
+    <div>
+      <div class="brand">ISHAN <span>MART</span></div>
+      <div class="location">📍 Your neighbourhood grocery store</div>
+    </div>
+    <button class="icon-btn" onclick="showPanel('profile')">👤</button>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input id="searchInput" placeholder="Search groceries..." oninput="renderProducts()">
+  </div>
+</header>
+
+<main>
+  <section id="homePanel" class="panel active">
+    <div class="hero">
+      <h2>Fresh groceries, delivered simply.</h2>
+      <p>Everyday essentials, handpicked for your home.</p>
+      <button onclick="document.getElementById('productsSection').scrollIntoView({behavior:'smooth'})">Shop now →</button>
+    </div>
+
+    <div class="section-head"><h3>Shop by category</h3></div>
+    <div class="categories" id="categories"></div>
+
+    <div class="section-head"><h3>Popular picks</h3><button onclick="showAllProducts()">See all</button></div>
+    <div class="products" id="popularProducts">
+      <div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+
+    <div class="section-head"><h3>Picked for you</h3></div>
+    <div class="products" id="recommendedProducts"></div>
+
+    <div class="section-head"><h3>Recently added</h3></div>
+    <div class="products" id="recentProducts"></div>
+
+    <div class="section-head" id="productsSection"><h3>All products</h3></div>
+    <div class="filter-row">
+      <select id="sortSelect" onchange="renderProducts()">
+        <option value="default">Sort: Recommended</option>
+        <option value="priceLow">Price: Low to high</option>
+        <option value="priceHigh">Price: High to low</option>
+        <option value="name">Name: A to Z</option>
+        <option value="newest">Newest first</option>
+      </select>
+      <select id="stockFilter" onchange="renderProducts()">
+        <option value="all">All stock</option>
+        <option value="available">In stock</option>
+        <option value="low">Low stock</option>
+      </select>
+    </div>
+    <div class="products" id="allProducts" style="margin-top:13px"></div>
+  </section>
+
+  <section id="wishlistPanel" class="panel">
+    <div class="section-head"><h3>♡ My favourites</h3></div>
+    <div class="products" id="wishlistProducts"></div>
+  </section>
+
+  <section id="cartPanel" class="panel">
+    <div class="section-head"><h3>My cart</h3></div>
+    <div id="cartContent"></div>
+  </section>
+
+  <section id="ordersPanel" class="panel">
+    <div class="section-head"><h3>My orders</h3></div>
+    <p class="small">Your order history is loaded from this device's signed-in customer account.</p>
+    <div id="ordersContent"></div>
+  </section>
+
+  <section id="profilePanel" class="panel">
+    <div class="section-head"><h3>My account</h3></div>
+    <div class="card">
+      <h3 style="margin-top:0">Customer profile</h3>
+      <div class="field"><label>Your name</label><input id="profileName" placeholder="Enter your name"></div>
+      <div class="field"><label>Phone number</label><input id="profilePhone" placeholder="Enter phone number" inputmode="tel"></div>
+      <button class="primary" onclick="saveProfile()">Save profile</button>
+    </div>
+    <div class="card">
+      <div class="row"><h3>Saved addresses</h3><button class="secondary" onclick="addAddress()">+ Add</button></div>
+      <div id="addressesList"></div>
+    </div>
+    <div class="card">
+      <h3>Recently viewed</h3>
+      <div class="products" id="viewedProducts"></div>
+    </div>
+    <div class="card">
+      <h3>Recently purchased</h3>
+      <div id="purchasedProducts"></div>
+    </div>
+    <div class="card">
+      <h3>Customer support</h3>
+      <p class="small">Need help with an order or product? Contact the store.</p>
+      <div class="field"><label>Support email</label><input id="supportEmail" value="support@ishanmart.example" readonly></div>
+      <button class="secondary" onclick="contactSupport()">Contact support</button>
+    </div>
+  </section>
+
+  <section id="detailPanel" class="panel">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <div id="detailContent" style="margin-top:15px"></div>
+  </section>
+
+  <section id="checkoutPanel" class="panel">
+    <button class="back-btn" onclick="showPanel('cart')">← Back to cart</button>
+    <div class="section-head"><h3>Checkout</h3></div>
+    <div class="card">
+      <h3 style="margin-top:0">Delivery details</h3>
+      <div class="field"><label>Customer name</label><input id="checkoutName"></div>
+      <div class="field"><label>Phone number</label><input id="checkoutPhone" inputmode="tel"></div>
+      <div class="field"><label>Delivery address</label><textarea id="checkoutAddress" placeholder="House number, street, area"></textarea></div>
+      <div class="field"><label>Delivery instructions (optional)</label><textarea id="deliveryInstructions" placeholder="Example: Please ring the doorbell"></textarea></div>
+      <div class="field"><label>Payment method</label>
+        <select id="paymentMethod">
+          <option value="COD">Cash on Delivery</option>
+          <option value="UPI">UPI (payment choice only)</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Coupon code</h3>
+      <div class="row">
+        <input id="couponInput" placeholder="Enter coupon" style="min-width:0;width:65%;padding:12px;border:1px solid var(--line);border-radius:11px">
+        <button class="secondary" onclick="applyCoupon()">Apply</button>
+      </div>
+      <p id="couponMessage" class="small"></p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Bill summary</h3>
+      <div id="checkoutSummary"></div>
+      <p class="small">Estimated delivery: 45–60 minutes. This is an estimate, not live tracking.</p>
+      <button class="primary" style="width:100%;margin-top:12px" id="placeOrderBtn" onclick="placeOrder()">Place order</button>
+    </div>
+  </section>
+
+  <section id="confirmationPanel" class="panel">
+    <div class="card" style="text-align:center;padding:35px 18px">
+      <div style="font-size:55px">🎉</div>
+      <h2>Order placed!</h2>
+      <p class="small">Thank you for shopping with Ishan Mart.</p>
+      <p id="confirmationId" style="font-weight:800"></p>
+      <button class="primary" onclick="showPanel('orders')">Track my order</button>
+      <button class="secondary" onclick="showPanel('home')" style="margin-left:5px">Continue shopping</button>
+    </div>
+  </section>
+</main>
+
+<button class="floating-cart" id="floatingCart" onclick="showPanel('cart')">🛒 Cart · 0</button>
+
+<nav class="bottom-nav">
+  <button class="nav-item active" data-panel="home" onclick="showPanel('home')"><span>⌂</span>Home</button>
+  <button class="nav-item" data-panel="wishlist" onclick="showPanel('wishlist')"><span>♡</span>Saved</button>
+  <button class="nav-item" data-panel="cart" onclick="showPanel('cart')"><span>🛒</span>Cart</button>
+  <button class="nav-item" data-panel="orders" onclick="showPanel('orders')"><span>▤</span>Orders</button>
+  <button class="nav-item" data-panel="profile" onclick="showPanel('profile')"><span>☺</span>Account</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+<script>
+// =====================================
+// FIREBASE CONFIGURATION
+// =====================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDci6dFkW3Sgfx8fzGjEYPQPbhG7EuwpXE",
+  authDomain: "ishan-mart.firebaseapp.com",
+  projectId: "ishan-mart",
+  storageBucket: "ishan-mart.firebasestorage.app",
+  messagingSenderId: "807194530965",
+  appId: "1:807194530965:web:de67c1361adfe1b2c7b79c"
+};
+
+// =====================================
+// STORE SETTINGS - EDIT THESE LATER
+// =====================================
+const SETTINGS = {
+  deliveryCharge: 30,
+  freeDeliveryAbove: 499,
+  minimumOrder: 99,
+  estimatedDelivery: "45–60 minutes",
+  lowStockLimit: 5,
+  couponCode: "MART10",
+  couponPercent: 10,
+  couponMaxDiscount: 50
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let currentUser = null;
+let products = [];
+let cart = JSON.parse(localStorage.getItem("im_cart") || "[]");
+let wishlist = JSON.parse(localStorage.getItem("im_wishlist") || "[]");
+let viewed = JSON.parse(localStorage.getItem("im_viewed") || "[]");
+let savedForLater = JSON.parse(localStorage.getItem("im_saved") || "[]");
+let addresses = JSON.parse(localStorage.getItem("im_addresses") || "[]");
+let profile = JSON.parse(localStorage.getItem("im_profile") || "{}");
+let recentOrderIds = JSON.parse(localStorage.getItem("im_order_ids") || "[]");
+let appliedCoupon = null;
+let selectedCategory = "All";
+let activeProductId = null;
+let previousPanel = "home";
+let toastTimer = null;
+
+// =====================================
+// HELPERS
+// =====================================
+function money(n){return "₹"+Number(n||0).toFixed(2)}
+function escapeHTML(s){
+  return String(s??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function showToast(message){
+  const el=document.getElementById("toast");
+  el.textContent=message;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove("show"),2400);
+}
+function saveLocal(){
+  localStorage.setItem("im_cart",JSON.stringify(cart));
+  localStorage.setItem("im_wishlist",JSON.stringify(wishlist));
+  localStorage.setItem("im_viewed",JSON.stringify(viewed));
+  localStorage.setItem("im_saved",JSON.stringify(savedForLater));
+  localStorage.setItem("im_addresses",JSON.stringify(addresses));
+  localStorage.setItem("im_profile",JSON.stringify(profile));
+}
+function getStock(p){
+  const value=p.stock ?? p.quantity ?? 999;
+  return Math.max(0,Number(value)||0);
+}
+function getImage(p){
+  return p.image || p.imageUrl || p.photo || "";
+}
+function getOldPrice(p){
+  return Number(p.oldPrice || p.originalPrice || p.mrp || p.compareAtPrice || 0);
+}
+function getPrice(p){return Number(p.price||0)}
+function getCategory(p){return p.category||"Other"}
+function findProduct(id){return products.find(p=>p.id===id)}
+function cartCount(){return cart.reduce((n,x)=>n+x.quantity,0)}
+function cartSubtotal(){return cart.reduce((n,x)=>n+x.price*x.quantity,0)}
+function getDelivery(subtotal){
+  return subtotal>=SETTINGS.freeDeliveryAbove ? 0 : SETTINGS.deliveryCharge;
+}
+function couponDiscount(subtotal){
+  if(!appliedCoupon)return 0;
+  return Math.min(subtotal*SETTINGS.couponPercent/100,SETTINGS.couponMaxDiscount);
+}
+function updateFloatingCart(){
+  document.getElementById("floatingCart").textContent=`🛒 Cart · ${cartCount()}`;
+}
+
+// =====================================
+// AUTHENTICATION
+// =====================================
+auth.onAuthStateChanged(async user=>{
+  try{
+    if(user){
+      currentUser=user;
+      await loadProducts();
+    }else{
+      await auth.signInAnonymously();
+    }
+  }catch(error){
+    console.error("Authentication error:",error);
+    showToast("Login failed: "+error.code);
+  }
+});
+
+// =====================================
+// PRODUCTS
+// =====================================
+let unsubscribeCustomerProducts = null;
+function loadProducts(){
+  try{
+    if(unsubscribeCustomerProducts) unsubscribeCustomerProducts();
+    unsubscribeCustomerProducts = db.collection("products").onSnapshot(snapshot=>{
+      products=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+      // Keep cart quantities/prices aligned with the latest catalogue.
+      cart=cart.filter(item=>products.some(p=>p.id===item.id));
+      cart=cart.map(item=>{
+        const latest=findProduct(item.id);
+        return latest ? {...item,name:latest.name,price:getPrice(latest),quantity:Math.min(item.quantity,getStock(latest))} : item;
+      }).filter(item=>item.quantity>0);
+      saveLocal();
+      renderCategories();
+      renderProducts();
+      renderRecommendations();
+      renderWishlist();
+      renderViewed();
+      renderPurchased();
+      renderCart();
+    },error=>{
+      console.error("Products listener error:",error);
+      showToast("Could not sync products: "+(error.code||"check connection"));
+    });
+  }catch(error){
+    console.error("Products error:",error);
+    showToast("Could not load products: "+(error.code||"unknown error"));
+  }
+}
+
+function renderCategories(){
+  const cats=["All",...new Set(products.map(getCategory))];
+  const icons={
+    All:"🛍️",Fruits:"🍎",Vegetables:"🥦",Dairy:"🥛",
+    Snacks:"🍿",Beverages:"🥤",Bakery:"🍞",
+    Grocery:"🛒",Personal:"🧴",Household:"🧹"
+  };
+  document.getElementById("categories").innerHTML=cats.map(c=>`
+    <button class="cat" onclick="selectCategory('${escapeHTML(c).replace(/'/g,"\\'")}')">
+      <span class="emoji">${icons[c]||"🧺"}</span>
+      <small>${escapeHTML(c)}</small>
+    </button>`).join("");
+}
+function selectCategory(c){
+  selectedCategory=c;
+  renderProducts();
+  document.getElementById("productsSection").scrollIntoView({behavior:"smooth"});
+}
+function productCard(p){
+  const stock=getStock(p);
+  const old=getOldPrice(p);
+  const price=getPrice(p);
+  const discount=old>price&&old>0?Math.round((old-price)/old*100):0;
+  const isFav=wishlist.includes(p.id);
+  const image=getImage(p);
+  return `
+  <article class="product">
+    <button class="fav ${isFav?"active":""}" onclick="toggleWishlist('${p.id}')">${isFav?"♥":"♡"}</button>
+    <div onclick="openProduct('${p.id}')">
+      <img class="product-image" src="${escapeHTML(image||'https://placehold.co/400x300/eaf4ef/063f3b?text=Ishan+Mart')}" loading="lazy" alt="${escapeHTML(p.name)}">
+      <h4>${escapeHTML(p.name||"Product")}</h4>
+      <div class="muted">${escapeHTML(getCategory(p))}</div>
+      <div class="price-row">
+        <span class="price">${money(price)}</span>
+        ${old>price?`<span class="old-price">${money(old)}</span><span class="discount">${discount}% off</span>`:""}
+      </div>
+      <div class="stock-label ${stock===0?"out":stock<=SETTINGS.lowStockLimit?"low":""}">
+        ${stock===0?"Out of stock":stock<=SETTINGS.lowStockLimit?`Only ${stock} left`: "In stock"}
+      </div>
+    </div>
+    <button class="add-btn" ${stock===0?"disabled":""} onclick="addToCart('${p.id}')">
+      ${stock===0?"Unavailable":"＋ Add to cart"}
+    </button>
+  </article>`;
+}
+function renderProducts(){
+  const query=(document.getElementById("searchInput")?.value||"").toLowerCase();
+  let list=products.filter(p=>{
+    const match=(p.name||"").toLowerCase().includes(query);
+    const cat=selectedCategory==="All"||getCategory(p)===selectedCategory;
+    const stock=getStock(p);
+    const filter=document.getElementById("stockFilter")?.value||"all";
+    const stockMatch=filter==="all"||(filter==="available"&&stock>0)||(filter==="low"&&stock>0&&stock<=SETTINGS.lowStockLimit);
+    return match&&cat&&stockMatch;
+  });
+  const sort=document.getElementById("sortSelect")?.value||"default";
+  if(sort==="priceLow")list.sort((a,b)=>getPrice(a)-getPrice(b));
+  if(sort==="priceHigh")list.sort((a,b)=>getPrice(b)-getPrice(a));
+  if(sort==="name")list.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  if(sort==="newest")list.sort((a,b)=>String(b.createdAt||b.addedAt||"").localeCompare(String(a.createdAt||a.addedAt||"")));
+  document.getElementById("allProducts").innerHTML=list.length?list.map(productCard).join():`<div class="empty">No products found.</div>`;
+  const popular=products.filter(p=>p.popular||p.isPopular||p.featured||p.popularity||p.soldCount||p.sales);
+  document.getElementById("popularProducts").innerHTML=(popular.length?popular:products.slice(0,8)).map(productCard).join("")||`<div class="empty">Products coming soon.</div>`;
+  const recent=[...products].sort((a,b)=>String(b.createdAt||b.addedAt||"").localeCompare(String(a.createdAt||a.addedAt||""))).slice(0,6);
+  document.getElementById("recentProducts").innerHTML=recent.map(productCard).join("")||`<div class="empty">No products yet.</div>`;
+}
+function showAllProducts(){
+  selectedCategory="All";
+  document.getElementById("searchInput").value="";
+  renderProducts();
+  document.getElementById("productsSection").scrollIntoView({behavior:"smooth"});
+}
+
+// =====================================
+// PRODUCT DETAILS, RATINGS AND REVIEWS
+// =====================================
+function openProduct(id){
+  const p=findProduct(id);
+  if(!p)return;
+  activeProductId=id;
+  previousPanel=document.querySelector(".panel.active")?.id.replace("Panel","")||"home";
+  viewed=[id,...viewed.filter(x=>x!==id)].slice(0,12);
+  saveLocal();
+  renderViewed();
+  const old=getOldPrice(p);
+  const reviews=JSON.parse(localStorage.getItem("im_reviews_"+id)||"[]");
+  const average=reviews.length?reviews.reduce((s,r)=>s+r.rating,0)/reviews.length:0;
+  const together=products.filter(x=>x.id!==id&&getCategory(x)===getCategory(p)).slice(0,4);
+  document.getElementById("detailContent").innerHTML=`
+    <img class="detail-image" src="${escapeHTML(getImage(p)||'https://placehold.co/600x450/eaf4ef/063f3b?text=Ishan+Mart')}" alt="${escapeHTML(p.name)}">
+    <div class="row" style="margin-top:12px">
+      <span class="small">${escapeHTML(getCategory(p))}</span>
+      <button class="secondary" onclick="toggleWishlist('${p.id}');openProduct('${p.id}')">${wishlist.includes(id)?"♥ Saved":"♡ Save"}</button>
+    </div>
+    <h2 class="detail-title">${escapeHTML(p.name)}</h2>
+    <div class="price-row"><span class="price" style="font-size:23px">${money(getPrice(p))}</span>${old>getPrice(p)?`<span class="old-price">${money(old)}</span>`:""}</div>
+    <p class="small">${getStock(p)===0?"Currently unavailable":getStock(p)<=SETTINGS.lowStockLimit?`Only ${getStock(p)} left in stock`:"Available in stock"}</p>
+    <p>${escapeHTML(p.description||p.details||"A quality grocery product selected for your everyday needs.")}</p>
+    <button class="primary" style="width:100%" ${getStock(p)===0?"disabled":""} onclick="addToCart('${p.id}')">${getStock(p)===0?"Out of stock":"Add to cart"}</button>
+    <div class="section-head"><h3>Ratings & reviews</h3></div>
+    <div class="card">
+      <div class="stars">${average? "★".repeat(Math.round(average))+"☆".repeat(5-Math.round(average)):"☆☆☆☆☆"}</div>
+      <p class="small">${reviews.length?average.toFixed(1)+" / 5 · "+reviews.length+" local review(s)":"No reviews yet"}</p>
+      <div class="field"><label>Your rating</label><select id="reviewRating"><option value="5">★★★★★ - Excellent</option><option value="4">★★★★ - Good</option><option value="3">★★★ - Average</option><option value="2">★★ - Poor</option><option value="1">★ - Very poor</option></select></div>
+      <div class="field"><label>Your review</label><textarea id="reviewText" placeholder="Share your product feedback"></textarea></div>
+      <button class="secondary" onclick="submitReview('${p.id}')">Submit review on this device</button>
+      ${reviews.map(r=>`<p class="small"><b>${"★".repeat(r.rating)}</b> ${escapeHTML(r.text)} </p>`).join("")}
+    </div>
+    <div class="section-head"><h3>Frequently bought together</h3></div>
+    <div class="products">${together.map(productCard).join("")||`<p class="small">More related products will appear here.</p>`}</div>
+  `;
+  showPanel("detail");
+}
+function submitReview(id){
+  const rating=Number(document.getElementById("reviewRating").value);
+  const textValue=document.getElementById("reviewText").value.trim();
+  if(!textValue){showToast("Please write a review first.");return}
+  const key="im_reviews_"+id;
+  const reviews=JSON.parse(localStorage.getItem(key)||"[]");
+  reviews.unshift({rating,text:textValue,date:new Date().toISOString()});
+  localStorage.setItem(key,JSON.stringify(reviews.slice(0,30)));
+  showToast("Review saved on this device.");
+  openProduct(id);
+}
+function goBack(){showPanel(previousPanel||"home")}
+
+// =====================================
+// WISHLIST
+// =====================================
+function toggleWishlist(id){
+  wishlist.includes(id)?wishlist=wishlist.filter(x=>x!==id):wishlist.push(id);
+  saveLocal();
+  renderWishlist();
+  renderProducts();
+  updateFloatingCart();
+  showToast(wishlist.includes(id)?"Added to favourites":"Removed from favourites");
+}
+function renderWishlist(){
+  const list=wishlist.map(findProduct).filter(Boolean);
+  document.getElementById("wishlistProducts").innerHTML=list.length?list.map(productCard).join():`<div class="empty"><b>♡</b>Your favourites will appear here.</div>`;
+}
+
+// =====================================
+// CART AND SAVE FOR LATER
+// =====================================
+function addToCart(id){
+  const p=findProduct(id);
+  if(!p)return;
+  if(getStock(p)<=0){showToast("This product is out of stock.");return}
+  const item=cart.find(x=>x.id===id);
+  if(item){
+    if(item.quantity>=getStock(p)){showToast("Stock limit reached.");return}
+    item.quantity++;
+  }else{
+    cart.push({id,name:p.name,price:getPrice(p),quantity:1});
+  }
+  saveLocal();
+  updateFloatingCart();
+  showToast("Added to cart.");
+}
+function changeQty(id,delta){
+  const item=cart.find(x=>x.id===id);
+  const p=findProduct(id);
+  if(!item)return;
+  item.quantity+=delta;
+  if(item.quantity<=0)cart=cart.filter(x=>x.id!==id);
+  else if(p&&item.quantity>getStock(p)){item.quantity=getStock(p);showToast("Stock limit reached.");}
+  saveLocal();
+  renderCart();
+  updateFloatingCart();
+}
+function saveCartItem(id){
+  const item=cart.find(x=>x.id===id);
+  if(!item)return;
+  savedForLater.push(item);
+  cart=cart.filter(x=>x.id!==id);
+  saveLocal();
+  renderCart();
+  showToast("Saved for later.");
+}
+function restoreSaved(id){
+  const item=savedForLater.find(x=>x.id===id);
+  if(!item)return;
+  const p=findProduct(id);
+  if(!p||getStock(p)<=0){showToast("This item is unavailable.");return}
+  const existing=cart.find(x=>x.id===id);
+  if(existing)existing.quantity+=item.quantity;
+  else cart.push(item);
+  savedForLater=savedForLater.filter(x=>x.id!==id);
+  saveLocal();
+  renderCart();
+  updateFloatingCart();
+}
+function renderCart(){
+  const el=document.getElementById("cartContent");
+  if(!cart.length){
+    el.innerHTML=`<div class="empty"><b>🛒</b>Your cart is empty.</div>`;
+  }else{
+    el.innerHTML=cart.map(item=>`
+      <div class="card">
+        <div class="row">
+          <div><b>${escapeHTML(item.name)}</b><div class="small">${money(item.price)} each</div></div>
+          <b>${money(item.price*item.quantity)}</b>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div>
+            <button class="secondary" onclick="changeQty('${item.id}',-1)">−</button>
+            <b style="padding:0 10px">${item.quantity}</b>
+            <button class="secondary" onclick="changeQty('${item.id}',1)">+</button>
+          </div>
+          <div>
+            <button class="secondary" onclick="saveCartItem('${item.id}')">Save</button>
+            <button class="danger" onclick="changeQty('${item.id}',-${item.quantity})">Remove</button>
           </div>
         </div>
+      </div>`).join("");
+    const sub=cartSubtotal();
+    el.innerHTML+=`
+      <div class="card">
+        <div class="total-line"><span>Subtotal</span><b>${money(sub)}</b></div>
+        <div class="total-line"><span>Delivery</span><b>${getDelivery(sub)===0?"FREE":money(getDelivery(sub))}</b></div>
+        <div class="total-line final"><span>Total</span><span>${money(sub+getDelivery(sub))}</span></div>
+        <p class="small">${sub<SETTINGS.freeDeliveryAbove?`Add ${money(SETTINGS.freeDeliveryAbove-sub)} more for free delivery.`:"You unlocked free delivery!"}</p>
+        <button class="primary" style="width:100%" onclick="startCheckout()">Continue to checkout</button>
+      </div>`;
+  }
+  if(savedForLater.length){
+    el.innerHTML+=`<div class="section-head"><h3>Saved for later</h3></div>`+
+      savedForLater.map(x=>`<div class="card row"><div><b>${escapeHTML(x.name)}</b><div class="small">${money(x.price)}</div></div><button class="secondary" onclick="restoreSaved('${x.id}')">Move to cart</button></div>`).join("");
+  }
+  if(cart.length){
+    const suggestions=products.filter(p=>!cart.some(x=>x.id===p.id)&&getStock(p)>0).slice(0,4);
+    el.innerHTML+=`<div class="section-head"><h3>You may also like</h3></div><div class="products">${suggestions.map(productCard).join("")}</div>`;
+  }
+  updateFloatingCart();
+}
 
-        <div class="nav">
-          <button class="active" onclick="showSection('productsSection',this)">
-            Products & Stock
-          </button>
-          <button onclick="showSection('ordersSection',this)">Orders</button>
-          <button onclick="showSection('cancellationsSection',this)">
-            Cancellations
-          </button>
-          <button onclick="showSection('customersSection',this)">
-            Customers
-          </button>
+// =====================================
+// CHECKOUT, DELIVERY, COUPONS
+// =====================================
+function startCheckout(){
+  if(!cart.length){showToast("Your cart is empty.");return}
+  const sub=cartSubtotal();
+  if(sub<SETTINGS.minimumOrder){showToast("Minimum order is "+money(SETTINGS.minimumOrder));return}
+  document.getElementById("checkoutName").value=profile.name||"";
+  document.getElementById("checkoutPhone").value=profile.phone||"";
+  document.getElementById("checkoutAddress").value=addresses[0]?.address||"";
+  appliedCoupon=null;
+  document.getElementById("couponInput").value="";
+  document.getElementById("couponMessage").textContent="";
+  updateCheckoutSummary();
+  showPanel("checkout");
+}
+function applyCoupon(){
+  const code=document.getElementById("couponInput").value.trim().toUpperCase();
+  if(code===SETTINGS.couponCode){
+    appliedCoupon=code;
+    document.getElementById("couponMessage").textContent="Coupon applied successfully!";
+  }else{
+    appliedCoupon=null;
+    document.getElementById("couponMessage").textContent="Invalid coupon code.";
+  }
+  updateCheckoutSummary();
+}
+function updateCheckoutSummary(){
+  const sub=cartSubtotal();
+  const delivery=getDelivery(sub);
+  const discount=couponDiscount(sub);
+  const total=Math.max(0,sub+delivery-discount);
+  document.getElementById("checkoutSummary").innerHTML=`
+    <div class="total-line"><span>Items subtotal</span><b>${money(sub)}</b></div>
+    <div class="total-line"><span>Delivery charge</span><b>${delivery?money(delivery):"FREE"}</b></div>
+    <div class="total-line"><span>Coupon discount</span><b style="color:#16805e">−${money(discount)}</b></div>
+    <div class="total-line final"><span>Payable total</span><span>${money(total)}</span></div>
+    <p class="small">${sub<SETTINGS.freeDeliveryAbove?`Add ${money(SETTINGS.freeDeliveryAbove-sub)} to unlock free delivery.`:"Free delivery unlocked."}</p>`;
+}
+
+// =====================================
+// PLACE ORDER - ADMIN COMPATIBLE FIELDS
+// =====================================
+async function placeOrder(){
+  if(!currentUser){showToast("Please wait for login.");return}
+  if(!cart.length){showToast("Your cart is empty.");return}
+  const name=document.getElementById("checkoutName").value.trim();
+  const phone=document.getElementById("checkoutPhone").value.trim();
+  const address=document.getElementById("checkoutAddress").value.trim();
+  const instructions=document.getElementById("deliveryInstructions").value.trim();
+  const paymentMethod=document.getElementById("paymentMethod").value;
+  const subtotal=cartSubtotal();
+
+  if(subtotal<SETTINGS.minimumOrder){showToast("Minimum order is "+money(SETTINGS.minimumOrder));return}
+  if(!name||!phone||!address){showToast("Please complete your delivery details.");return}
+  if(!/^[0-9]{10}$/.test(phone)){showToast("Enter a valid 10-digit phone number.");return}
+
+  for(const item of cart){
+    const p=findProduct(item.id);
+    if(!p||getStock(p)<item.quantity){
+      showToast("Stock changed for "+item.name+". Please update your cart.");
+      return;
+    }
+  }
+
+  const total=Math.max(0,subtotal+getDelivery(subtotal)-couponDiscount(subtotal));
+  const btn=document.getElementById("placeOrderBtn");
+  btn.disabled=true;
+  btn.textContent="Placing order...";
+
+  try{
+    const order={
+      customerUid:currentUser.uid,
+      customerName:name,
+      phone:phone,
+      address:address,
+      paymentMethod:paymentMethod,
+      items:cart.map(x=>({
+        productId:x.id,
+        name:x.name,
+        price:x.price,
+        quantity:x.quantity
+      })),
+      total:total,
+      status:"Pending",
+      createdAt:new Date().toISOString(),
+
+      // Additional compatible order information
+      subtotal:subtotal,
+      deliveryCharge:getDelivery(subtotal),
+      discount:couponDiscount(subtotal),
+      couponCode:appliedCoupon||"",
+      deliveryInstructions:instructions,
+      estimatedDelivery:SETTINGS.estimatedDelivery
+    };
+
+    const doc=await db.collection("orders").add(order);
+    recentOrderIds=[doc.id,...recentOrderIds.filter(x=>x!==doc.id)].slice(0,20);
+    localStorage.setItem("im_order_ids",JSON.stringify(recentOrderIds));
+
+    profile={...profile,name,phone};
+    localStorage.setItem("im_profile",JSON.stringify(profile));
+
+    cart=[];
+    appliedCoupon=null;
+    saveLocal();
+    updateFloatingCart();
+    document.getElementById("confirmationId").textContent="Order ID: "+doc.id;
+    showPanel("confirmation");
+    showToast("Your order has been placed!");
+  }catch(error){
+    console.error("Order error:",error);
+    showToast("Order failed: "+error.code);
+  }finally{
+    btn.disabled=false;
+    btn.textContent="Place order";
+  }
+}
+
+// =====================================
+// ORDER HISTORY AND STATUS TIMELINE
+// =====================================
+async function loadOrders(){
+  const el=document.getElementById("ordersContent");
+  if(!currentUser){el.innerHTML=`<div class="empty">Please wait for login.</div>`;return}
+  el.innerHTML=`<div class="empty">Loading your orders...</div>`;
+  try{
+    const snap=await db.collection("orders").where("customerUid","==",currentUser.uid).get();
+    const docs=snap.docs.map(doc=>({id:doc.id,...doc.data()}));
+    docs.sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+    recentOrderIds=docs.map(o=>o.id).slice(0,50);
+    localStorage.setItem("im_order_ids",JSON.stringify(recentOrderIds));
+    el.innerHTML=docs.length?docs.map(orderCard).join():`<div class="empty"><b>▤</b>No orders found for this account on this device.</div>`;
+  }catch(error){
+    console.error("Order history error:",error);
+    el.innerHTML=`<div class="empty">Could not load order history: ${escapeHTML(error.code||"connection error")}</div>`;
+  }
+}
+function orderCard(o){
+  const status=String(o.status||"Pending");
+  const stages=["Pending","Accepted","Preparing","Out for delivery","Delivered"];
+  const completed=status==="Delivered"?5:Math.max(0,stages.indexOf(status)+1);
+  const cancelled=status.toLowerCase().includes("cancel");
+  const timeline=cancelled?
+    `<p class="small">Cancellation status: ${escapeHTML(status)}</p>`:
+    `<div class="timeline">${stages.map((s,i)=>`
+      <div class="step ${i<completed?"done":""}">
+        <div class="dot">${i<completed?"✓":i+1}</div>
+        <div><b>${s}</b><div class="small">${i===0?"Order received":i===4?"Order completed":"Order progress"}</div></div>
+      </div>`).join("")}</div>`;
+  const canRequest=!cancelled&&status.toLowerCase()!=="delivered";
+  return `<div class="card">
+    <div class="row"><b>Order #${escapeHTML(o.id.slice(0,8))}</b><b>${money(o.total)}</b></div>
+    <p class="small">${new Date(o.createdAt||Date.now()).toLocaleString("en-IN")}</p>
+    <p class="small">Status: <b>${escapeHTML(status)}</b></p>
+    ${timeline}
+    <p class="small">Estimated delivery: ${escapeHTML(o.estimatedDelivery||SETTINGS.estimatedDelivery)}</p>
+    ${canRequest?`<button class="danger" onclick="requestCancellation('${o.id}')">Request cancellation</button>`:""}
+  </div>`;
+}
+async function requestCancellation(orderId){
+  const reason=prompt("Enter a short reason for your cancellation request:");
+  if(reason===null)return;
+  if(!reason.trim()){showToast("Please enter a reason.");return}
+  try{
+    await db.collection("cancellationRequests").add({
+      orderId:orderId,
+      customerUid:currentUser.uid,
+      reason:reason.trim(),
+      status:"Requested",
+      createdAt:new Date().toISOString()
+    });
+    showToast("Cancellation request sent.");
+  }catch(error){
+    console.error("Cancellation request error:",error);
+    showToast("Could not send request: "+error.code);
+  }
+}
+
+// =====================================
+// PROFILE AND MULTIPLE ADDRESSES
+// =====================================
+function saveProfile(){
+  profile.name=document.getElementById("profileName").value.trim();
+  profile.phone=document.getElementById("profilePhone").value.trim();
+  saveLocal();
+  showToast("Profile saved on this device.");
+}
+function renderProfile(){
+  document.getElementById("profileName").value=profile.name||"";
+  document.getElementById("profilePhone").value=profile.phone||"";
+  document.getElementById("addressesList").innerHTML=addresses.length?
+    addresses.map((a,i)=>`
+      <div class="card">
+        <b>${escapeHTML(a.label)}</b><p class="small">${escapeHTML(a.address)}</p>
+        <div class="row">
+          <button class="secondary" onclick="useAddress(${i})">Use at checkout</button>
+          <button class="danger" onclick="deleteAddress(${i})">Delete</button>
         </div>
-
-        <section id="productsSection">
-          <div class="panel">
-            <h2>Add New Product</h2>
-            <label>Product name</label>
-            <input id="pname" placeholder="Example: Amul Milk" />
-            <div class="grid">
-              <div>
-                <label>Price (₹)</label
-                ><input
-                  id="pprice"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="30"
-                />
-              </div>
-              <div>
-                <label>Available stock</label
-                ><input
-                  id="pstock"
-                  type="number"
-                  min="0"
-                  step="1"
-                  placeholder="20"
-                />
-              </div>
-            </div>
-            <label>Product image URL</label>
-            <input
-              id="pimage"
-              type="url"
-              placeholder="https://example.com/product.jpg"
-            />
-            <img id="imagePreview" class="preview" alt="Product preview" />
-            <button class="primary" onclick="addProduct()">Add Product</button>
-            <p id="productMessage"></p>
-          </div>
-
-          <div class="panel">
-            <h2>Manage Products & Stock</h2>
-            <p class="small-note">Low stock means 5 or fewer units.</p>
-            <input
-              id="productSearch"
-              placeholder="Search products..."
-              oninput="filterProducts()"
-            />
-            <div id="productList">Loading products...</div>
-          </div>
-        </section>
-
-        <section id="ordersSection" class="panel hidden">
-          <h2>Customer Orders</h2>
-          <p class="small-note">Stock is deducted when an order is accepted.</p>
-          <input
-            id="orderSearch"
-            placeholder="Search by customer, phone or order ID..."
-            oninput="filterOrders()"
-          />
-          <p id="ordersMessage">Loading orders...</p>
-          <div id="orderList"></div>
-        </section>
-
-        <section id="cancellationsSection" class="panel hidden">
-          <h2>Cancellation Requests</h2>
-          <p class="small-note">
-            Approving a request cancels the order and restores deducted stock
-            when applicable.
-          </p>
-          <p id="cancellationMessage">Loading requests...</p>
-          <div id="cancellationList"></div>
-        </section>
-
-        <section id="customersSection" class="panel hidden">
-          <h2>Customers</h2>
-          <p class="small-note">Customers who have placed orders.</p>
-          <input
-            id="customerSearch"
-            placeholder="Search customers..."
-            oninput="filterCustomers()"
-          />
-          <div id="customerList">Loading customers...</div>
-        </section>
-      </section>
-    </main>
-
-    <script>
-      (function(){
-      "use strict";
-
-      const firebaseConfig={
-       apiKey:"AIzaSyDci6dFkW3Sgfx8fzGjEYPQPbhG7EuwpXE",
-       authDomain:"ishan-mart.firebaseapp.com",
-       projectId:"ishan-mart",
-       storageBucket:"ishan-mart.firebasestorage.app",
-       messagingSenderId:"807194530965",
-       appId:"1:807194530965:web:de67c1361adfe1b2c7b79c"
-      };
-
-      const ADMIN_UID="LkxRY5jQxmVzOE1bIVXxvEvIsnf2";
-      const LOW_STOCK_LIMIT=5;
-
-      let auth,db;
-      let unsubscribeProducts=null;
-      let unsubscribeOrders=null;
-      let unsubscribeRequests=null;
-      let allProducts=[];
-      let allOrders=[];
-      let allRequests=[];
-      let customerData=[];
-
-      const loginSection=document.getElementById("loginSection");
-      const dashboard=document.getElementById("dashboard");
-      const logoutButton=document.getElementById("logoutButton");
-
-      try{
-       if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
-       auth=firebase.auth();
-       db=firebase.firestore();
-      }catch(error){
-       document.getElementById("loginMessage").textContent="Firebase error: "+error.message;
-       return;
-      }
-
-      function escapeHTML(value){
-       return String(value==null?"":value).replace(/[&<>"']/g,function(c){
-        return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
-       });
-      }
-
-      function money(value){
-       return "₹"+(Number(value)||0).toFixed(2);
-      }
-
-      function dateText(value){
-       if(!value)return "Date not available";
-       try{
-        if(value.toDate)return value.toDate().toLocaleString("en-IN");
-        const d=new Date(value);
-        return isNaN(d.getTime())?"Date not available":d.toLocaleString("en-IN");
-       }catch(e){return "Date not available";}
-      }
-
-      function setStatus(message){
-       document.getElementById("status").textContent=message;
-      }
-
-      function stopListeners(){
-       if(unsubscribeProducts){unsubscribeProducts();unsubscribeProducts=null;}
-       if(unsubscribeOrders){unsubscribeOrders();unsubscribeOrders=null;}
-       if(unsubscribeRequests){unsubscribeRequests();unsubscribeRequests=null;}
-      }
-
-      window.login=async function(){
-       const email=document.getElementById("email").value.trim();
-       const password=document.getElementById("password").value;
-       const output=document.getElementById("loginMessage");
-       if(!email||!password){output.textContent="Enter your email and password.";return;}
-       output.textContent="Logging in...";
-       try{await auth.signInWithEmailAndPassword(email,password);}
-       catch(error){output.textContent="Login error: "+error.message;}
-      };
-
-      auth.onAuthStateChanged(async function(user){
-       if(!user){
-        stopListeners();
-        loginSection.classList.remove("hidden");
-        dashboard.classList.add("hidden");
-        logoutButton.classList.add("hidden");
-        return;
-       }
-
-       if(user.uid!==ADMIN_UID){
-        document.getElementById("loginMessage").textContent="This account is not authorized as an admin.";
-        await auth.signOut();
-        return;
-       }
-
-       loginSection.classList.add("hidden");
-       dashboard.classList.remove("hidden");
-       logoutButton.classList.remove("hidden");
-       loadProducts();
-       loadOrders();
-       loadCancellationRequests();
-      });
-
-      window.logout=function(){auth.signOut();};
-
-      window.showSection=function(sectionId,button){
-       document.querySelectorAll("#dashboard > section").forEach(s=>s.classList.add("hidden"));
-       document.getElementById(sectionId).classList.remove("hidden");
-       document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-       button.classList.add("active");
-      };
-
-      // IMAGE PREVIEW
-      const imageInput=document.getElementById("pimage");
-      const imagePreview=document.getElementById("imagePreview");
-
-      imageInput.addEventListener("input",function(){
-       const url=imageInput.value.trim();
-       imagePreview.style.display="none";
-       if(!url)return;
-       try{
-        const parsed=new URL(url);
-        if(parsed.protocol!=="https:")return;
-        imagePreview.onload=()=>imagePreview.style.display="block";
-        imagePreview.onerror=()=>imagePreview.style.display="none";
-        imagePreview.src=url;
-       }catch(e){imagePreview.style.display="none";}
-      });
-
-      // ADD PRODUCT
-      window.addProduct=async function(){
-       const name=document.getElementById("pname").value.trim();
-       const priceValue=document.getElementById("pprice").value;
-       const stockValue=document.getElementById("pstock").value;
-       const imageUrl=document.getElementById("pimage").value.trim();
-       const price=Number(priceValue);
-       const stock=Number(stockValue);
-       const output=document.getElementById("productMessage");
-
-       if(!name||priceValue===""||stockValue===""){
-        output.textContent="Enter product name, price and stock.";
-        return;
-       }
-       if(!Number.isFinite(price)||price<0){
-        output.textContent="Enter a valid price.";return;
-       }
-       if(!Number.isInteger(stock)||stock<0){
-        output.textContent="Stock must be a whole number of 0 or more.";return;
-       }
-       if(imageUrl){
-        try{
-         if(new URL(imageUrl).protocol!=="https:"){
-          output.textContent="Image URL must start with https://";return;
-         }
-        }catch(e){output.textContent="Enter a valid image URL.";return;}
-       }
-
-       output.textContent="Adding product...";
-       try{
-        await db.collection("products").add({
-         name,price,stock,imageUrl,
-         createdAt:firebase.firestore.FieldValue.serverTimestamp()
-        });
-        ["pname","pprice","pstock","pimage"].forEach(id=>document.getElementById(id).value="");
-        imagePreview.style.display="none";
-        output.textContent="Product added successfully!";
-       }catch(error){output.textContent="Error: "+error.message;}
-      };
-
-      // LOAD PRODUCTS
-      function loadProducts(){
-       if(unsubscribeProducts)unsubscribeProducts();
-       unsubscribeProducts=db.collection("products").onSnapshot(snapshot=>{
-        allProducts=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
-        allProducts.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-        document.getElementById("productCount").textContent=allProducts.length;
-        renderProducts(allProducts);
-       },error=>{
-        document.getElementById("productList").textContent="Could not load products: "+error.message;
-       });
-      }
-
-      function renderProducts(products){
-       const list=document.getElementById("productList");
-       if(!products.length){list.innerHTML='<p class="empty">No products found.</p>';return;}
-
-       list.innerHTML=products.map(p=>{
-        const stock=Number(p.stock??p.quantity??0);
-        const cls=stock<=0?"stock-out":stock<=LOW_STOCK_LIMIT?"stock-low":"stock-good";
-        const label=stock<=0?"Out of stock":stock<=LOW_STOCK_LIMIT?"Low stock":"In stock";
-        const image=p.imageUrl||p.image||p.photo;
-        const imageHTML=image
-         ?'<img src="'+escapeHTML(image)+'" alt="Product" onerror="this.style.visibility=\'hidden\'">'
-         :'<div style="width:70px;height:70px;background:#303138;border-radius:9px;display:grid;place-items:center">🛍️</div>';
-
-        return `
-         <div class="product">
-          ${imageHTML}
-          <div class="product-info">
-           <strong>${escapeHTML(p.name||"Product")}</strong>
-           <p>${money(p.price)}</p>
-           <p class="${cls}">${label}: ${stock} units</p>
-           <label>Change stock quantity</label>
-           <input type="number" min="0" step="1" value="${stock}" data-stock-input="${escapeHTML(p.id)}" style="max-width:130px">
-           <button class="primary" data-save-stock="${escapeHTML(p.id)}">Save stock</button>
-          </div>
-          <button class="danger" data-delete="${escapeHTML(p.id)}">Delete</button>
-         </div>`;
-       }).join("");
-      }
-
-      window.filterProducts=function(){
-       const q=document.getElementById("productSearch").value.toLowerCase();
-       renderProducts(allProducts.filter(p=>String(p.name||"").toLowerCase().includes(q)));
-      };
-
-      document.getElementById("productList").addEventListener("click",async function(event){
-       const save=event.target.closest("[data-save-stock]");
-       const del=event.target.closest("[data-delete]");
-
-       if(save){
-        const id=save.dataset.saveStock;
-        const input=document.querySelector('[data-stock-input="'+id+'"]');
-        const stock=Number(input?.value);
-        if(!Number.isInteger(stock)||stock<0){alert("Enter a valid whole-number stock quantity.");return;}
-        save.disabled=true;
-        try{
-         await db.collection("products").doc(id).update({stock});
-         setStatus("Stock quantity updated.");
-        }catch(error){alert("Could not update stock: "+error.message);}
-        finally{save.disabled=false;}
-       }
-
-       if(del){
-        const id=del.dataset.delete;
-        if(!confirm("Are you sure you want to delete this product?"))return;
-        try{await db.collection("products").doc(id).delete();}
-        catch(error){alert("Could not delete product: "+error.message);}
-       }
-      });
-
-      // STOCK TRANSACTION HELPERS
-
-      function getOrderQuantities(items){
-       if(!Array.isArray(items)||!items.length){
-        throw new Error("This order has no product items.");
-       }
-
-       const quantities={};
-
-       items.forEach(item=>{
-        const productId=item.productId;
-        const quantity=Number(item.quantity);
-
-        if(!productId){
-         throw new Error("An order item is missing its product ID. Please review this order manually.");
-        }
-        if(!Number.isInteger(quantity)||quantity<=0){
-         throw new Error("An order item has an invalid quantity.");
-        }
-
-        quantities[productId]=(quantities[productId]||0)+quantity;
-       });
-
-       return quantities;
-      }
-
-      async function changeOrderStatusWithStock(orderId,newStatus){
-       const orderRef=db.collection("orders").doc(orderId);
-
-       await db.runTransaction(async transaction=>{
-        const orderSnap=await transaction.get(orderRef);
-        if(!orderSnap.exists)throw new Error("Order not found.");
-
-        const order=orderSnap.data();
-        const oldStatus=order.status||"Pending";
-
-        if(oldStatus==="Cancelled"&&newStatus==="Accepted"&&!order.stockRestored){
-         throw new Error("This cancelled order has not been marked as stock-restored. Please review it manually.");
-        }
-
-        const shouldDeduct=
-         newStatus==="Accepted"&&
-         (!order.stockDeducted||order.stockRestored===true);
-
-        const shouldRestore=
-         newStatus==="Cancelled"&&
-         order.stockDeducted===true&&
-         order.stockRestored!==true;
-
-        let productUpdates=[];
-
-        if(shouldDeduct||shouldRestore){
-         const quantities=getOrderQuantities(order.items);
-         const ids=Object.keys(quantities);
-
-         // Read every product before writing anything.
-         const productSnaps=[];
-
-         for(const productId of ids){
-          const ref=db.collection("products").doc(productId);
-          const snap=await transaction.get(ref);
-          if(!snap.exists){
-           throw new Error("Product "+productId+" no longer exists. No stock was changed.");
-          }
-          productSnaps.push({ref,snap,productId});
-         }
-
-         for(const entry of productSnaps){
-          const data=entry.snap.data();
-          const currentStock=Number(data.stock??data.quantity??0);
-          const quantity=quantities[entry.productId];
-
-          if(!Number.isFinite(currentStock)||currentStock<0){
-           throw new Error("Invalid stock value for "+(data.name||entry.productId)+".");
-          }
-
-          if(shouldDeduct&&currentStock<quantity){
-           throw new Error(
-            "Not enough stock for "+(data.name||entry.productId)+
-            ". Available: "+currentStock+
-            ", required: "+quantity+
-            ". No stock was changed."
-           );
-          }
-
-          productUpdates.push({
-           ref:entry.ref,
-           newStock:shouldDeduct?currentStock-quantity:currentStock+quantity
-          });
-         }
-        }
-
-        // All reads are complete. Now write product and order updates.
-        productUpdates.forEach(item=>{
-         transaction.update(item.ref,{stock:item.newStock});
-        });
-
-        const update={
-         status:newStatus,
-         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-        };
-
-        if(shouldDeduct){
-         update.stockDeducted=true;
-         update.stockRestored=false;
-         update.stockDeductedAt=firebase.firestore.FieldValue.serverTimestamp();
-         update.stockRestoredAt=null;
-        }
-
-        if(shouldRestore){
-         update.stockRestored=true;
-         update.stockRestoredAt=firebase.firestore.FieldValue.serverTimestamp();
-        }
-
-        transaction.update(orderRef,update);
-       });
-      }
-
-      // LOAD ORDERS
-      function loadOrders(){
-       if(unsubscribeOrders)unsubscribeOrders();
-
-       unsubscribeOrders=db.collection("orders").onSnapshot(snapshot=>{
-        allOrders=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
-        allOrders.sort((a,b)=>{
-         const dateA=a.createdAt?.seconds||new Date(a.createdAt||0).getTime()/1000;
-         const dateB=b.createdAt?.seconds||new Date(b.createdAt||0).getTime()/1000;
-         return dateB-dateA;
-        });
-        document.getElementById("orderCount").textContent=allOrders.length;
-        renderOrders(allOrders);
-        renderCustomers();
-       },error=>{
-        document.getElementById("ordersMessage").textContent="Could not load orders: "+error.message;
-       });
-      }
-
-      function renderOrders(orders){
-       const list=document.getElementById("orderList");
-       document.getElementById("ordersMessage").textContent="Total orders: "+orders.length;
-
-       if(!orders.length){list.innerHTML='<p class="empty">No orders found.</p>';return;}
-
-       list.innerHTML=orders.map(order=>{
-        const items=Array.isArray(order.items)?order.items:[];
-        const status=order.status||"Pending";
-
-        const itemHTML=items.length?items.map(item=>`
-         <div class="order-item">
-          <span>${escapeHTML(item.name||"Product")} × ${Number(item.quantity)||0}</span>
-          <strong>${money((Number(item.price)||0)*(Number(item.quantity)||0))}</strong>
-         </div>
-        `).join(""):'<p class="small-note">No item details.</p>';
-
-        const statuses=["Pending","Accepted","Preparing","Out for delivery","Delivered","Cancelled"];
-        const selected=status==="Out for Delivery"?"Out for delivery":status;
-        const options=statuses.map(s=>
-         `<option value="${s}" ${s===selected?"selected":""}>${s}</option>`
-        ).join("");
-
-        const inventoryNote=order.stockDeducted&&!order.stockRestored
-         ?'<span class="tag" style="color:#d7ff45">Stock deducted</span>'
-         :order.stockRestored
-         ?'<span class="tag" style="color:#36c98b">Stock restored</span>'
-         :'<span class="tag">Stock not yet deducted</span>';
-
-        return `
-         <div class="order-card">
-          <div class="order-top">
-           <strong>Customer: ${escapeHTML(order.customerName||"Unknown")}</strong>
-           <span class="order-id">Order ID: ${escapeHTML(order.id)}</span>
-          </div>
-          <div class="order-detail">
-           <div><strong>Phone:</strong> ${escapeHTML(order.phone||"Not provided")}</div>
-           <div><strong>Address:</strong> ${escapeHTML(order.address||"Not provided")}</div>
-           <div><strong>Payment:</strong> ${escapeHTML(order.paymentMethod||"Not specified")}</div>
-           <div><strong>Customer UID:</strong> ${escapeHTML(order.customerUid||"Not available")}</div>
-           <div><strong>Placed:</strong> ${dateText(order.createdAt)}</div>
-          </div>
-          <div class="order-items">
-           <strong>Ordered products</strong>
-           ${itemHTML}
-          </div>
-          <div class="order-detail">
-           <div><strong>Subtotal:</strong> ${money(order.subtotal)}</div>
-           <div><strong>Delivery charge:</strong> ${money(order.deliveryCharge)}</div>
-           <div><strong>Discount:</strong> ${money(order.discount)}</div>
-           <div><strong>Coupon:</strong> ${escapeHTML(order.couponCode||"None")}</div>
-           <div><strong>Instructions:</strong> ${escapeHTML(order.deliveryInstructions||"None")}</div>
-           <div><strong>Estimated delivery:</strong> ${escapeHTML(order.estimatedDelivery||"Not specified")}</div>
-          </div>
-          <div class="order-total">Total: ${money(order.total)}</div>
-          <div>${inventoryNote}</div>
-          <div class="order-status" style="margin-top:15px">
-           <label>Update order status</label>
-           <select data-order-status="${escapeHTML(order.id)}" data-old-status="${escapeHTML(status)}">${options}</select>
-           <p class="small-note">Changing to Accepted deducts stock. Changing to Cancelled restores previously deducted stock.</p>
-          </div>
-         </div>`;
-       }).join("");
-      }
-
-      window.filterOrders=function(){
-       const q=document.getElementById("orderSearch").value.toLowerCase();
-       renderOrders(allOrders.filter(order=>
-        [order.customerName,order.phone,order.id,order.address]
-         .some(value=>String(value||"").toLowerCase().includes(q))
-       ));
-      };
-
-      // UPDATE ORDER STATUS AND STOCK
-      document.getElementById("orderList").addEventListener("change",async function(event){
-       const select=event.target.closest("[data-order-status]");
-       if(!select)return;
-
-       const id=select.dataset.orderStatus;
-       const newStatus=select.value;
-       const oldStatus=select.dataset.oldStatus;
-
-       select.disabled=true;
-       setStatus("Updating order and inventory...");
-
-       try{
-        await changeOrderStatusWithStock(id,newStatus);
-        setStatus(newStatus==="Accepted"?"Order accepted and stock updated.":"Order status updated.");
-       }catch(error){
-        alert("Could not update order: "+error.message);
-        select.value=oldStatus;
-        setStatus("Order update was not completed.");
-       }finally{
-        select.disabled=false;
-       }
-      });
-
-      // LOAD CANCELLATION REQUESTS
-      function loadCancellationRequests(){
-       if(unsubscribeRequests)unsubscribeRequests();
-
-       unsubscribeRequests=db.collection("cancellationRequests").onSnapshot(snapshot=>{
-        allRequests=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
-        allRequests.sort((a,b)=>{
-         const dateA=a.createdAt?.seconds||new Date(a.createdAt||0).getTime()/1000;
-         const dateB=b.createdAt?.seconds||new Date(b.createdAt||0).getTime()/1000;
-         return dateB-dateA;
-        });
-
-        document.getElementById("requestCount").textContent=
-         allRequests.filter(r=>(r.status||"Requested")==="Requested").length;
-        renderCancellationRequests();
-       },error=>{
-        document.getElementById("cancellationMessage").textContent="Could not load requests: "+error.message;
-       });
-      }
-
-      function renderCancellationRequests(){
-       const list=document.getElementById("cancellationList");
-       document.getElementById("cancellationMessage").textContent="Total requests: "+allRequests.length;
-
-       if(!allRequests.length){list.innerHTML='<p class="empty">No cancellation requests yet.</p>';return;}
-
-       list.innerHTML=allRequests.map(request=>{
-        const status=request.status||"Requested";
-        const pending=status==="Requested";
-
-        return `
-         <div class="request-card">
-          <div class="order-top">
-           <strong>Cancellation request</strong>
-           <span class="tag">${escapeHTML(status)}</span>
-          </div>
-          <div class="order-detail">
-           <div><strong>Request ID:</strong> ${escapeHTML(request.id)}</div>
-           <div><strong>Order ID:</strong> ${escapeHTML(request.orderId||"Not provided")}</div>
-           <div><strong>Customer UID:</strong> ${escapeHTML(request.customerUid||"Not provided")}</div>
-           <div><strong>Reason:</strong> ${escapeHTML(request.reason||"No reason given")}</div>
-           <div><strong>Requested:</strong> ${dateText(request.createdAt)}</div>
-          </div>
-          ${pending?`
-           <div class="actions">
-            <button class="success" data-approve-request="${escapeHTML(request.id)}">Approve cancellation</button>
-            <button class="danger" data-reject-request="${escapeHTML(request.id)}">Reject request</button>
-           </div>`:""}
-         </div>`;
-       }).join("");
-      }
-
-      // APPROVE / REJECT CANCELLATION
-      document.getElementById("cancellationList").addEventListener("click",async function(event){
-       const approve=event.target.closest("[data-approve-request]");
-       const reject=event.target.closest("[data-reject-request]");
-       if(!approve&&!reject)return;
-
-       const requestId=approve?approve.dataset.approveRequest:reject.dataset.rejectRequest;
-       const request=allRequests.find(r=>r.id===requestId);
-       if(!request)return;
-
-       if(!confirm(approve?"Approve this cancellation and restore stock if needed?":"Reject this cancellation request?"))return;
-
-       try{
-        if(approve){
-         if(!request.orderId)throw new Error("This request has no order ID.");
-
-         const orderSnap=await db.collection("orders").doc(request.orderId).get();
-         if(!orderSnap.exists)throw new Error("The related order could not be found.");
-         if(orderSnap.data().customerUid!==request.customerUid){
-          throw new Error("Customer does not match the order. Please review manually.");
-         }
-
-         await changeOrderStatusWithStock(request.orderId,"Cancelled");
-        }
-
-        await db.collection("cancellationRequests").doc(requestId).update({
-         status:approve?"Approved":"Rejected",
-         reviewedAt:firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        setStatus(approve?"Cancellation approved.":"Cancellation request rejected.");
-       }catch(error){
-        alert("Could not process request: "+error.message);
-       }
-      });
-
-      // CUSTOMERS
-      function renderCustomers(){
-       const customers={};
-
-       allOrders.forEach(order=>{
-        const uid=order.customerUid||"unknown-"+(order.phone||order.id);
-
-        if(!customers[uid]){
-         customers[uid]={
-          uid,name:order.customerName||"Unknown",
-          phone:order.phone||"Not provided",
-          address:order.address||"Not provided",
-          orderCount:0,totalSpent:0
-         };
-        }
-
-        customers[uid].orderCount++;
-        customers[uid].totalSpent+=Number(order.total)||0;
-        if(order.customerName)customers[uid].name=order.customerName;
-        if(order.phone)customers[uid].phone=order.phone;
-        if(order.address)customers[uid].address=order.address;
-       });
-
-       customerData=Object.values(customers);
-       renderCustomerCards(customerData);
-      }
-
-      function renderCustomerCards(customers){
-       const list=document.getElementById("customerList");
-       if(!customers.length){list.innerHTML='<p class="empty">No customers with orders yet.</p>';return;}
-
-       list.innerHTML=customers.map(c=>`
-        <div class="customer-card">
-         <strong>${escapeHTML(c.name)}</strong>
-         <div class="order-detail">
-          <div><strong>Phone:</strong> ${escapeHTML(c.phone)}</div>
-          <div><strong>Latest saved order address:</strong> ${escapeHTML(c.address)}</div>
-          <div><strong>Customer UID:</strong> ${escapeHTML(c.uid)}</div>
-          <div><strong>Total orders:</strong> ${c.orderCount}</div>
-          <div><strong>Total order value:</strong> ${money(c.totalSpent)}</div>
-         </div>
-        </div>
-       `).join("");
-      }
-
-      window.filterCustomers=function(){
-       const q=document.getElementById("customerSearch").value.toLowerCase();
-       renderCustomerCards(customerData.filter(c=>
-        [c.name,c.phone,c.address,c.uid].some(v=>String(v||"").toLowerCase().includes(q))
-       ));
-      };
-
-      })();
-    </script>
-  </body>
+      </div>`).join(""):`<p class="small">No saved addresses yet.</p>`;
+}
+function addAddress(){
+  const label=prompt("Address label (Home, Work, etc.):");
+  if(!label)return;
+  const address=prompt("Enter the full delivery address:");
+  if(!address)return;
+  addresses.push({label:label.trim(),address:address.trim()});
+  saveLocal();
+  renderProfile();
+  showToast("Address saved.");
+}
+function useAddress(i){
+  profile.selectedAddress=i;
+  saveLocal();
+  showToast("Address selected. It will be available at checkout.");
+}
+function deleteAddress(i){
+  addresses.splice(i,1);
+  saveLocal();
+  renderProfile();
+}
+
+// =====================================
+// PERSONAL RECOMMENDATIONS
+// =====================================
+function renderRecommendations(){
+  const preferred=products.filter(p=>viewed.some(id=>{
+    const old=findProduct(id);
+    return old&&getCategory(old)===getCategory(p);
+  }));
+  const list=preferred.length?preferred:products.filter(p=>p.popular||p.featured||p.isPopular);
+  document.getElementById("recommendedProducts").innerHTML=(list.filter(p=>!viewed.includes(p.id)).slice(0,6).map(productCard).join())||products.slice(0,4).map(productCard).join();
+}
+function renderViewed(){
+  const list=viewed.map(findProduct).filter(Boolean);
+  document.getElementById("viewedProducts").innerHTML=list.length?list.map(productCard).join():`<p class="small">Products you view will appear here.</p>`;
+}
+function renderPurchased(){
+  const el=document.getElementById("purchasedProducts");
+  el.innerHTML=`<p class="small">Your recent purchases will appear here when order history is available.</p>`;
+  if(!currentUser)return;
+  db.collection("orders").where("customerUid","==",currentUser.uid).get().then(snap=>{
+    const names=[];
+    snap.forEach(doc=>(doc.data().items||[]).forEach(x=>names.push(x.name)));
+    const unique=[...new Set(names)].slice(0,8);
+    el.innerHTML=unique.length?unique.map(n=>`<span class="small">${escapeHTML(n)} · </span>`).join(""):`<p class="small">No purchases yet.</p>`;
+  }).catch(e=>console.warn("Purchase history:",e.code));
+}
+
+// =====================================
+// SUPPORT
+// =====================================
+function contactSupport(){
+  const email="support@ishanmart.example";
+  window.location.href="mailto:"+email+"?subject=Ishan%20Mart%20Customer%20Support";
+}
+
+// =====================================
+// NAVIGATION
+// =====================================
+function showPanel(name){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  const target=document.getElementById(name+"Panel");
+  if(target)target.classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(b=>{
+    b.classList.toggle("active",b.dataset.panel===name);
+  });
+  if(name==="cart")renderCart();
+  if(name==="wishlist")renderWishlist();
+  if(name==="orders")loadOrders();
+  if(name==="profile"){renderProfile();renderViewed();renderPurchased();}
+  if(name==="home")renderProducts();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// =====================================
+// STARTUP
+// =====================================
+updateFloatingCart();
+setTimeout(()=>{
+  const splash=document.getElementById("splash");
+  splash.style.opacity="0";
+  setTimeout(()=>splash.remove(),550);
+},1300);
+</script>
+</body>
 </html>
