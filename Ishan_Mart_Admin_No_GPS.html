@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101114">
+<title>Ishan Mart Admin — Upgraded</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#101114;--panel:#191a1f;--panel2:#25262c;--lime:#d7ff45;--text:#f7f7f4;--muted:#a5a6ad;--line:#383941;--red:#ff6666;--green:#70d69a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:9px;padding:11px 14px;font-weight:700}button:disabled{opacity:.55;cursor:not-allowed}.primary{background:var(--lime);color:#101114}.secondary{background:#34353d;color:white;border:1px solid #484951}.danger{background:#a93636;color:white}.success{background:#246b45;color:white}header{background:#191a1f;border-bottom:1px solid var(--line);padding:16px max(18px,calc((100% - 1200px)/2));display:flex;align-items:center;justify-content:space-between;gap:14px;position:sticky;top:0;z-index:5}.logo{font-weight:900;color:var(--lime);font-size:22px;letter-spacing:.5px}main{max-width:1200px;margin:auto;padding:24px 18px}.panel{background:var(--panel);border:1px solid var(--line);padding:20px;border-radius:15px;margin-bottom:18px}.hidden{display:none!important}h1,h2,h3{margin-top:0}h1{font-size:27px}h2{font-size:20px;color:var(--lime)}.muted,.small{color:var(--muted);font-size:13px}.nav{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}.nav button{background:#303138;color:white}.nav button.active{background:var(--lime);color:#111}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{background:var(--panel2);padding:16px;border-radius:12px;border:1px solid var(--line)}.stat span{color:var(--muted);font-size:13px}.stat strong{display:block;font-size:26px;margin-top:8px;color:var(--lime)}input,select{width:100%;background:var(--panel2);color:white;border:1px solid #45464e;border-radius:8px;padding:12px;margin:7px 0 13px}label{display:block;color:#c5c5cb;font-size:13px;margin-top:7px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.product{display:grid;grid-template-columns:65px minmax(120px,1fr) 105px 105px 130px;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.product img{width:62px;height:62px;border-radius:9px;object-fit:cover;background:#303138}.product strong{display:block}.product input{margin:0;padding:9px}.product .meta{font-size:12px;color:var(--muted);margin-top:4px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.toolbar input{flex:1;min-width:180px}.order-card,.request-card{background:var(--panel2);border:1px solid var(--line);padding:16px;border-radius:12px;margin:12px 0}.order-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.order-id{color:var(--lime);font-size:12px;overflow-wrap:anywhere}.order-detail{color:#c4c4ca;line-height:1.65;margin:10px 0}.items{border-top:1px solid #45464e;border-bottom:1px solid #45464e;padding:10px 0;margin:10px 0}.itemline{display:flex;justify-content:space-between;gap:10px;padding:4px 0}.total{color:var(--lime);font-weight:900;font-size:19px}.statusrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.statusrow select{max-width:230px;margin:0}.message{margin:10px 0;color:var(--lime);white-space:pre-wrap}.preview{max-width:180px;max-height:130px;object-fit:cover;border-radius:9px;display:none}.tablewrap{overflow-x:auto}.tablewrap table{border-collapse:collapse;width:100%;min-width:600px}.tablewrap th,.tablewrap td{text-align:left;border-bottom:1px solid var(--line);padding:10px;font-size:13px}.pill{display:inline-block;border-radius:20px;background:#333640;padding:4px 9px;font-size:12px;color:var(--lime)}.notice{background:#302c1c;border:1px solid #665b2c;color:#f4e4a2;padding:12px;border-radius:10px;font-size:13px;line-height:1.5}.empty{padding:18px;color:var(--muted)}@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.product{grid-template-columns:55px 1fr 82px 82px}.product .actions{grid-column:2/-1}.product img{width:52px;height:52px}header{padding:13px 15px}main{padding:16px 12px}.panel{padding:15px}.logo{font-size:18px}}
+</style>
+</head>
+<body>
+<header><div class="logo">ISHAN MART ADMIN</div><button id="logoutButton" class="secondary hidden" onclick="logout()">Logout</button></header>
+<main>
+<section id="loginSection" class="panel">
+<h1>Admin Login</h1><p class="muted">Sign in with your authorized Ishan Mart administrator account.</p>
+<label>Email</label><input id="email" type="email" autocomplete="username" placeholder="Admin email">
+<label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Admin password">
+<button class="primary" onclick="login()">Login to Dashboard</button><p id="loginMessage" class="message"></p>
+</section>
+<section id="dashboard" class="hidden">
+<h1>Store dashboard</h1>
+<div class="grid">
+<div class="stat"><span>Total products</span><strong id="statProducts">0</strong></div>
+<div class="stat"><span>Low stock (5 or fewer)</span><strong id="statLow">0</strong></div>
+<div class="stat"><span>Out of stock</span><strong id="statOut">0</strong></div>
+<div class="stat"><span>Total orders</span><strong id="statOrders">0</strong></div>
+<div class="stat"><span>Pending orders</span><strong id="statPending">0</strong></div>
+<div class="stat"><span>Delivered orders</span><strong id="statDelivered">0</strong></div>
+<div class="stat"><span>Sales from delivered orders</span><strong id="statSales">₹0</strong></div>
+<div class="stat"><span>Cancellation requests</span><strong id="statCancel">0</strong></div>
+</div>
+<div class="nav">
+<button class="active" onclick="showSection('productsSection',this)">Products</button>
+<button onclick="showSection('ordersSection',this)">Orders</button>
+<button onclick="showSection('cancellationsSection',this)">Cancellations</button>
+<button onclick="showSection('customersSection',this)">Customers & Reports</button>
+</div>
+<section id="productsSection">
+<div class="panel">
+<h2>Add product</h2>
+<div class="two">
+<div><label>Product name</label><input id="pname" placeholder="e.g. Toned Milk 500 ml"></div>
+<div><label>Category</label><input id="pcategory" placeholder="e.g. Dairy"></div>
+<div><label>Price (₹)</label><input id="pprice" type="number" min="0" step="0.01" placeholder="30"></div>
+<div><label>Stock quantity</label><input id="pstock" type="number" min="0" step="1" placeholder="20"></div>
+</div>
+<label>Image URL (HTTPS)</label><input id="pimage" type="url" placeholder="https://...">
+<img id="imagePreview" class="preview" alt="Product preview">
+<label>Description (optional)</label><input id="pdescription" placeholder="Short product description">
+<button class="primary" onclick="addProduct()">Add product</button><p id="productMessage" class="message"></p>
+</div>
+<div class="panel">
+<h2>100 demo grocery products</h2>
+<p class="muted">Adds 100 clearly labelled sample products with category images, sample prices and sample stock. It does not overwrite your existing products. Use once; repeated clicks will skip IDs already present.</p>
+<button class="primary" id="seedButton" onclick="seedDemoProducts()">Add 100 sample products</button>
+<p id="seedMessage" class="message"></p>
+<div class="notice">These are demo catalogue entries, not confirmed shop inventory. Review prices, availability and images before accepting real customer orders.</div>
+</div>
+<div class="panel">
+<h2>Bulk import from Excel / CSV</h2>
+<p class="muted">Supported columns: name/product, price, stock/quantity, category, image/imageUrl, description. First row should contain column headings.</p>
+<input type="file" id="excelFile" accept=".xlsx,.xls,.csv">
+<button class="secondary" onclick="previewImport()">Preview spreadsheet</button>
+<button class="primary" id="importButton" onclick="importSpreadsheet()" disabled>Import previewed rows</button>
+<p id="importMessage" class="message"></p><div id="importPreview"></div>
+</div>
+<div class="panel">
+<h2>Manage products</h2>
+<div class="toolbar"><input id="productSearch" placeholder="Search name or category..." oninput="renderProducts()"><select id="categoryFilter" onchange="renderProducts()" style="max-width:220px"><option value="">All categories</option></select></div>
+<div id="productList"><div class="empty">Loading products...</div></div>
+</div>
+</section>
+<section id="ordersSection" class="panel hidden"><h2>Customer orders</h2><div class="toolbar"><input id="orderSearch" placeholder="Search customer, phone or order ID..." oninput="renderOrders()"><select id="orderFilter" onchange="renderOrders()" style="max-width:220px"><option value="">All statuses</option><option>Pending</option><option>Accepted</option><option>Preparing</option><option>Out for delivery</option><option>Delivered</option><option>Cancelled</option></select></div><p id="ordersMessage" class="muted">Listening for orders...</p><div id="orderList"></div></section>
+<section id="cancellationsSection" class="panel hidden"><h2>Cancellation requests</h2><p class="muted">Review requests before changing the order status.</p><div id="cancellationList"></div></section>
+<section id="customersSection" class="panel hidden"><h2>Customer overview</h2><p class="muted">Customer information is summarized from existing orders. This is not a separate customer account directory.</p><div id="customerList"></div></section>
+</section>
+</main>
+<script>
+(function(){
+"use strict";
+const firebaseConfig={
+ apiKey:"AIzaSyDci6dFkW3Sgfx8fzGjEYPQPbhG7EuwpXE",
+ authDomain:"ishan-mart.firebaseapp.com",
+ projectId:"ishan-mart",
+ storageBucket:"ishan-mart.firebasestorage.app",
+ messagingSenderId:"807194530965",
+ appId:"1:807194530965:web:de67c1361adfe1b2c7b79c"
+};
+const ADMIN_UID="LkxRY5jQxmVzOE1bIVXxvEvIsnf2";
+const LOW_STOCK_LIMIT=5;
+if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(),db=firebase.firestore();
+let products=[],orders=[],cancellations=[],importRows=[],unProducts=null,unOrders=null,unCancels=null;
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=n=>"₹"+Number(n||0).toFixed(2);
+const stamp=v=>{if(!v)return "—";if(v.toDate)return v.toDate().toLocaleString("en-IN");const d=new Date(v);return isNaN(d)?String(v):d.toLocaleString("en-IN")};
+function msg(id,t){$(id).textContent=t}
+window.login=async()=>{const email=$("email").value.trim(),password=$("password").value;if(!email||!password){msg("loginMessage","Enter email and password.");return}msg("loginMessage","Signing in...");try{await auth.signInWithEmailAndPassword(email,password)}catch(e){msg("loginMessage",e.message)}};
+window.logout=()=>auth.signOut();
+auth.onAuthStateChanged(async user=>{
+ if(!user){stopListeners();$("loginSection").classList.remove("hidden");$("dashboard").classList.add("hidden");$("logoutButton").classList.add("hidden");return}
+ if(user.uid!==ADMIN_UID){msg("loginMessage","This account is not authorized as admin.");await auth.signOut();return}
+ $("loginSection").classList.add("hidden");$("dashboard").classList.remove("hidden");$("logoutButton").classList.remove("hidden");listenData();
+});
+function stopListeners(){[unProducts,unOrders,unCancels].forEach(fn=>{if(fn)fn()});unProducts=unOrders=unCancels=null}
+window.showSection=(id,btn)=>{["productsSection","ordersSection","cancellationsSection","customersSection"].forEach(x=>$(x).classList.toggle("hidden",x!==id));document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active")};
+function listenData(){
+ stopListeners();
+ unProducts=db.collection("products").onSnapshot(s=>{products=s.docs.map(d=>({id:d.id,...d.data()}));renderProducts();updateStats();},e=>msg("productList","Product load error: "+e.message));
+ unOrders=db.collection("orders").onSnapshot(s=>{orders=s.docs.map(d=>({id:d.id,...d.data()}));renderOrders();renderCustomers();updateStats();},e=>msg("ordersMessage","Order load error: "+e.message));
+ unCancels=db.collection("cancellationRequests").onSnapshot(s=>{cancellations=s.docs.map(d=>({id:d.id,...d.data()}));renderCancellations();updateStats();},e=>msg("cancellationList","Cancellation load error: "+e.message));
+}
+function updateStats(){
+ $("statProducts").textContent=products.length;
+ $("statLow").textContent=products.filter(p=>Number(p.stock??p.quantity??0)>0&&Number(p.stock??p.quantity??0)<=LOW_STOCK_LIMIT).length;
+ $("statOut").textContent=products.filter(p=>Number(p.stock??p.quantity??0)<=0).length;
+ $("statOrders").textContent=orders.length;
+ $("statPending").textContent=orders.filter(o=>(o.status||"Pending")==="Pending").length;
+ $("statDelivered").textContent=orders.filter(o=>(o.status||"")==="Delivered").length;
+ $("statSales").textContent=money(orders.filter(o=>o.status==="Delivered").reduce((s,o)=>s+Number(o.total||0),0));
+ $("statCancel").textContent=cancellations.filter(c=>c.status==="Requested"||c.status==="Pending").length;
+}
+$("pimage").addEventListener("input",()=>{const u=$("pimage").value.trim(),im=$("imagePreview");im.style.display="none";try{if(new URL(u).protocol==="https:"){im.src=u;im.onload=()=>im.style.display="block"}}catch(e){}});
+window.addProduct=async()=>{
+ const name=$("pname").value.trim(),category=$("pcategory").value.trim()||"Other",price=Number($("pprice").value),stock=Number($("pstock").value),imageUrl=$("pimage").value.trim(),description=$("pdescription").value.trim();
+ if(!name||$("pprice").value===""||$("pstock").value===""){msg("productMessage","Enter name, price and stock.");return}
+ if(!Number.isFinite(price)||price<0||!Number.isInteger(stock)||stock<0){msg("productMessage","Price must be non-negative and stock must be a whole number.");return}
+ if(imageUrl){try{if(new URL(imageUrl).protocol!=="https:")throw 0}catch(e){msg("productMessage","Image URL must be a valid HTTPS link.");return}}
+ try{await db.collection("products").add({name,category,price,stock,imageUrl,description,createdAt:firebase.firestore.FieldValue.serverTimestamp()});["pname","pcategory","pprice","pstock","pimage","pdescription"].forEach(id=>$(id).value="");$("imagePreview").style.display="none";msg("productMessage","Product added.")}catch(e){msg("productMessage","Could not add product: "+e.message)}
+};
+function renderProducts(){
+ const q=($("productSearch").value||"").toLowerCase(),cat=$("categoryFilter").value;
+ const cats=[...new Set(products.map(p=>p.category||"Other"))].sort();
+ const old=$("categoryFilter").value;
+ $("categoryFilter").innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+ $("categoryFilter").value=cats.includes(old)?old:"";
+ const list=products.filter(p=>(!q||`${p.name||""} ${p.category||""}`.toLowerCase().includes(q))&&(!$("categoryFilter").value||(p.category||"Other")===$("categoryFilter").value));
+ $("productList").innerHTML=list.length?list.map(p=>`<div class="product">
+ <img src="${esc(p.imageUrl||p.image||"https://placehold.co/100x100?text=Item")}" alt="" onerror="this.src='https://placehold.co/100x100?text=Item'">
+ <div><strong>${esc(p.name||"Unnamed product")}</strong><div class="meta">${esc(p.category||"Other")} · ${esc(p.id)}</div><div class="meta">${Number(p.stock??p.quantity??0)<=LOW_STOCK_LIMIT?"⚠ Low stock":"Available"}</div></div>
+ <div><label>Price ₹</label><input type="number" min="0" step=".01" value="${Number(p.price||0)}" data-price="${esc(p.id)}"></div>
+ <div><label>Stock</label><input type="number" min="0" step="1" value="${Number(p.stock??p.quantity??0)}" data-stock="${esc(p.id)}"></div>
+ <div class="actions"><button class="primary" data-save="${esc(p.id)}">Save</button> <button class="danger" data-delete="${esc(p.id)}">Delete</button></div>
+ </div>`).join(""):'<div class="empty">No matching products.</div>';
+}
+$("productList").addEventListener("click",async e=>{
+ const save=e.target.closest("[data-save]"),del=e.target.closest("[data-delete]");
+ if(save){const id=save.dataset.save,priceEl=$(`[data-price="${CSS.escape(id)}"]`),stockEl=$(`[data-stock="${CSS.escape(id)}"]`),price=Number(priceEl.value),stock=Number(stockEl.value);if(!Number.isFinite(price)||price<0||!Number.isInteger(stock)||stock<0){alert("Enter a valid non-negative price and whole-number stock.");return}save.disabled=true;try{await db.collection("products").doc(id).update({price,stock,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});save.textContent="Saved";setTimeout(()=>save.textContent="Save",1200)}catch(err){alert("Save failed: "+err.message)}finally{save.disabled=false}}
+ if(del){const id=del.dataset.delete;if(!confirm("Delete this product? Existing order records will remain."))return;try{await db.collection("products").doc(id).delete()}catch(err){alert("Delete failed: "+err.message)}}
+});
+const sampleRows=[
+["Fruits & Vegetables","Apple (1 kg)",160,25],["Fruits & Vegetables","Banana (6 pcs)",45,30],["Fruits & Vegetables","Orange (1 kg)",90,20],["Fruits & Vegetables","Mango (1 kg)",120,18],["Fruits & Vegetables","Grapes (500 g)",75,20],["Fruits & Vegetables","Pomegranate (1 kg)",180,12],["Fruits & Vegetables","Papaya (1 pc)",55,15],["Fruits & Vegetables","Watermelon (1 pc)",65,12],["Fruits & Vegetables","Guava (500 g)",50,20],["Fruits & Vegetables","Pineapple (1 pc)",70,10],
+["Fruits & Vegetables","Potato (1 kg)",35,40],["Fruits & Vegetables","Onion (1 kg)",40,40],["Fruits & Vegetables","Tomato (1 kg)",35,35],["Fruits & Vegetables","Carrot (500 g)",30,25],["Fruits & Vegetables","Cucumber (500 g)",25,25],["Fruits & Vegetables","Spinach (1 bunch)",20,18],["Fruits & Vegetables","Cauliflower (1 pc)",40,12],["Fruits & Vegetables","Cabbage (1 pc)",35,12],["Fruits & Vegetables","Capsicum (500 g)",45,15],["Fruits & Vegetables","Green Peas (500 g)",60,14],
+["Dairy & Eggs","Toned Milk (500 ml)",30,40],["Dairy & Eggs","Full Cream Milk (500 ml)",35,35],["Dairy & Eggs","Curd (400 g)",40,25],["Dairy & Eggs","Paneer (200 g)",90,15],["Dairy & Eggs","Butter (100 g)",58,18],["Dairy & Eggs","Cheese Slices (10 pcs)",125,12],["Dairy & Eggs","Buttermilk (500 ml)",25,20],["Dairy & Eggs","Fresh Cream (250 ml)",65,10],["Dairy & Eggs","Eggs (6 pcs)",48,30],["Dairy & Eggs","Eggs (12 pcs)",92,24],
+["Staples & Grains","Wheat Atta (5 kg)",240,20],["Staples & Grains","Rice (5 kg)",320,18],["Staples & Grains","Basmati Rice (1 kg)",110,20],["Staples & Grains","Toor Dal (1 kg)",155,18],["Staples & Grains","Moong Dal (1 kg)",125,18],["Staples & Grains","Chana Dal (1 kg)",95,20],["Staples & Grains","Masoor Dal (1 kg)",105,20],["Staples & Grains","Besan (500 g)",55,20],["Staples & Grains","Poha (500 g)",35,25],["Staples & Grains","Sooji (500 g)",32,20],
+["Staples & Grains","Sugar (1 kg)",48,30],["Staples & Grains","Jaggery (500 g)",45,18],["Staples & Grains","Salt (1 kg)",22,30],["Staples & Grains","Cooking Oil (1 L)",145,20],["Staples & Grains","Ghee (500 ml)",290,12],["Staples & Grains","Tea Powder (250 g)",125,18],["Staples & Grains","Coffee (100 g)",115,16],["Staples & Grains","Turmeric Powder (100 g)",35,20],["Staples & Grains","Red Chilli Powder (100 g)",42,20],["Staples & Grains","Coriander Powder (100 g)",38,20],
+["Snacks","Potato Chips (small pack)",20,40],["Snacks","Salted Peanuts (200 g)",55,20],["Snacks"," biscuits (200 g)",35,25],["Snacks","Cream Biscuits (120 g)",30,25],["Snacks","Namkeen (200 g)",50,20],["Snacks","Mixture (200 g)",48,20],["Snacks","Popcorn (90 g)",35,20],["Snacks","Chocolate Bar",40,30],["Snacks","Dark Chocolate (100 g)",110,12],["Snacks","Instant Noodles (pack)",15,50],
+["Snacks","Cup Noodles",45,24],["Snacks","Rusk (200 g)",40,18],["Snacks","Toast (200 g)",38,18],["Snacks","Peanut Chikki (100 g)",30,20],["Snacks","Energy Bar",35,15],["Snacks","Roasted Makhana (80 g)",85,12],["Snacks","Nachos (150 g)",55,16],["Snacks","Cheese Puffs",30,20],["Snacks","Trail Mix (100 g)",95,10],["Snacks","Corn Flakes (250 g)",95,12],
+["Beverages","Packaged Water (1 L)",20,40],["Beverages","Soda (750 ml)",40,20],["Beverages","Orange Juice (1 L)",110,12],["Beverages","Mango Drink (600 ml)",40,24],["Beverages","Lemon Drink (600 ml)",35,24],["Beverages","Cold Coffee (200 ml)",35,18],["Beverages","Green Tea (25 bags)",145,10],["Beverages","Coconut Water (200 ml)",40,16],["Beverages","Lassi (200 ml)",30,20],["Beverages","Instant Drink Mix (500 g)",135,12],
+["Personal Care","Bath Soap (pack of 4)",120,20],["Personal Care","Shampoo (180 ml)",115,15],["Personal Care","Toothpaste (150 g)",95,18],["Personal Care","Toothbrush (1 pc)",30,25],["Personal Care","Handwash (250 ml)",75,16],["Personal Care","Hair Oil (200 ml)",110,14],["Personal Care","Face Wash (100 ml)",125,12],["Personal Care","Body Lotion (200 ml)",155,10],["Personal Care","Tissues (100 pulls)",65,20],["Personal Care","Sanitary Pads (pack)",85,15],
+["Household","Dishwash Liquid (500 ml)",95,16],["Household","Laundry Detergent (1 kg)",110,20],["Household","Floor Cleaner (1 L)",125,12],["Household","Toilet Cleaner (500 ml)",90,12],["Household","Garbage Bags (30 pcs)",75,16],["Household","Kitchen Sponge (2 pcs)",25,20],["Household","Aluminium Foil (9 m)",65,12],["Household","Paper Towels (2 rolls)",80,10],["Household","Mosquito Repellent (pack)",95,12],["Household","Room Freshener (200 ml)",115,10]
+];
+const imageByCat={
+ "Fruits & Vegetables":"https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80",
+ "Dairy & Eggs":"https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=600&q=80",
+ "Staples & Grains":"https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80",
+ "Snacks":"https://images.unsplash.com/photo-1621939514649-280e2aa2f4b2?auto=format&fit=crop&w=600&q=80",
+ "Beverages":"https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=600&q=80",
+ "Personal Care":"https://images.unsplash.com/photo-1608049540337-9c6a6b8d3c6f?auto=format&fit=crop&w=600&q=80",
+ "Household":"https://images.unsplash.com/photo-1585421514738-01798e348b17?auto=format&fit=crop&w=600&q=80"
+};
+window.seedDemoProducts=async()=>{
+ const btn=$("seedButton");btn.disabled=true;msg("seedMessage","Checking existing sample products...");
+ try{
+  let added=0,skipped=0;
+  for(let start=0;start<sampleRows.length;start+=400){
+   const chunk=sampleRows.slice(start,start+400),batch=db.batch();
+   for(let i=0;i<chunk.length;i++){
+    const row=chunk[i],n=start+i+1,id="demo_"+String(n).padStart(3,"0"),ref=db.collection("products").doc(id);
+    if(products.some(p=>p.id===id)){skipped++;continue}
+    batch.set(ref,{category:row[0],name:row[1],price:row[2],stock:row[3],imageUrl:imageByCat[row[0]],description:"Sample catalogue item for Ishan Mart. Confirm actual availability before selling.",isDemo:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    added++;
+   }
+   if(added)await batch.commit();
+  }
+  msg("seedMessage",`Finished. Added ${added} sample products; skipped ${skipped} existing sample IDs. Total sample catalogue: ${sampleRows.length}.`);
+ }catch(e){msg("seedMessage","Could not add sample products: "+e.message)}finally{btn.disabled=false}
+};
+function normalizeRow(row){
+ const obj={};Object.keys(row||{}).forEach(k=>obj[String(k).trim().toLowerCase().replace(/[\s_-]/g,"")]=row[k]);
+ const pick=(...keys)=>{for(const k of keys){if(obj[k]!==undefined&&obj[k]!==null&&String(obj[k]).trim()!=="")return obj[k]}return ""};
+ const name=String(pick("name","product","productname","item")).trim(),price=Number(pick("price","sellingprice","rate")),stock=Number(pick("stock","quantity","qty","available"));
+ return {name,price,stock,category:String(pick("category","type","department")||"Other").trim(),imageUrl:String(pick("imageurl","image","photo","photourl")||"").trim(),description:String(pick("description","details")||"").trim()};
+}
+window.previewImport=async()=>{
+ const file=$("excelFile").files[0];if(!file){msg("importMessage","Choose an Excel or CSV file first.");return}
+ try{
+  const data=await file.arrayBuffer(),wb=XLSX.read(data,{type:"array"}),sheet=wb.Sheets[wb.SheetNames[0]],raw=XLSX.utils.sheet_to_json(sheet,{defval:""});
+  importRows=raw.map(normalizeRow).filter(r=>r.name);
+  const bad=importRows.filter(r=>!Number.isFinite(r.price)||r.price<0||!Number.isInteger(r.stock)||r.stock<0);
+  $("importPreview").innerHTML=`<p class="muted">Rows detected: ${raw.length} · Valid names: ${importRows.length} · Rows needing price/stock correction: ${bad.length}</p><div class="tablewrap"><table><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Image URL</th></tr></thead><tbody>${importRows.slice(0,30).map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.category)}</td><td>${esc(r.price)}</td><td>${esc(r.stock)}</td><td>${r.imageUrl?"Provided":"—"}</td></tr>`).join("")}</tbody></table></div>${importRows.length>30?`<p class="muted">Showing first 30 rows only.</p>`:""}`;
+  $("importButton").disabled=!importRows.length||bad.length>0;msg("importMessage",bad.length?"Correct missing/invalid prices and stock in the spreadsheet, then preview again.":"Preview ready. No data has been written yet.");
+ }catch(e){importRows=[];$("importButton").disabled=true;msg("importMessage","Could not read spreadsheet: "+e.message)}
+};
+window.importSpreadsheet=async()=>{
+ if(!importRows.length)return;
+ const btn=$("importButton");btn.disabled=true;
+ try{
+  let added=0,skipped=0;
+  for(let start=0;start<importRows.length;start+=400){
+   const batch=db.batch(),chunk=importRows.slice(start,start+400);
+   for(const r of chunk){
+    const duplicate=products.some(p=>(p.name||"").trim().toLowerCase()===r.name.toLowerCase()&&(p.category||"Other").toLowerCase()===r.category.toLowerCase());
+    if(duplicate){skipped++;continue}
+    const ref=db.collection("products").doc();
+    batch.set(ref,{...r,createdAt:firebase.firestore.FieldValue.serverTimestamp(),source:"spreadsheet"});
+    added++;
+   }
+   if(chunk.length)await batch.commit();
+  }
+  msg("importMessage",`Import complete. Added ${added}; skipped likely duplicates ${skipped}.`);
+  importRows=[];$("importPreview").innerHTML="";
+ }catch(e){msg("importMessage","Import stopped: "+e.message+" — check the product list before retrying to avoid duplicates.")}finally{btn.disabled=false}
+};
+const statuses=["Pending","Accepted","Preparing","Out for delivery","Delivered","Cancelled"];
+window.renderOrders=()=>{
+ const q=($("orderSearch").value||"").toLowerCase(),filter=$("orderFilter").value;
+ const list=orders.filter(o=>(!filter||(o.status||"Pending")===filter)&&(!q||`${o.customerName||""} ${o.phone||""} ${o.id}`.toLowerCase().includes(q))).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+ $("ordersMessage").textContent=`${list.length} matching order(s)`;
+ $("orderList").innerHTML=list.length?list.map(o=>{
+  const items=Array.isArray(o.items)?o.items:[];
+  return `<article class="order-card"><div class="order-top"><strong>${esc(o.customerName||"Customer")}</strong><span class="order-id">#${esc(o.id)}</span></div>
+  <div class="order-detail">Phone: ${esc(o.phone||"—")}<br>Address: ${esc(o.address||"—")}<br>Payment preference: ${esc(o.paymentMethod||"—")}<br>Placed: ${esc(stamp(o.createdAt))}<br>Customer UID: ${esc(o.customerUid||"—")}</div>
+  <div class="items"><b>Items</b>${items.map(i=>`<div class="itemline"><span>${esc(i.name)} × ${Number(i.quantity||0)}</span><b>${money(Number(i.price||0)*Number(i.quantity||0))}</b></div>`).join("")}</div>
+  <div class="total">Total ${money(o.total)}</div><div class="statusrow"><label>Status</label><select data-status="${esc(o.id)}">${statuses.map(s=>`<option ${s===(o.status||"Pending")?"selected":""}>${s}</option>`).join("")}</select><span class="pill">${o.stockDeducted?"Stock deducted": "Stock not deducted"}</span></div>
+  </article>`;
+ }).join(""):'<div class="empty">No matching orders.</div>';
+};
+$("orderList").addEventListener("change",async e=>{
+ const sel=e.target.closest("[data-status]");if(!sel)return;const id=sel.dataset.status,status=sel.value;sel.disabled=true;
+ try{await updateOrderStatus(id,status)}catch(err){alert("Status update failed: "+err.message)}finally{sel.disabled=false}
+});
+async function updateOrderStatus(id,newStatus){
+ const ref=db.collection("orders").doc(id);
+ await db.runTransaction(async tx=>{
+  const snap=await tx.get(ref);if(!snap.exists)throw new Error("Order not found");
+  const o=snap.data(),items=Array.isArray(o.items)?o.items:[];
+  if(newStatus==="Accepted"&&!o.stockDeducted){
+   const refs=items.map(i=>db.collection("products").doc(i.productId||"__missing__"));
+   const snaps=[];for(const r of refs)snaps.push(await tx.get(r));
+   snaps.forEach((ps,i)=>{if(!ps.exists)throw new Error("Product missing: "+(items[i].name||"item"));const current=Number(ps.data().stock??ps.data().quantity??0),qty=Number(items[i].quantity||0);if(qty<1||current<qty)throw new Error("Insufficient stock for "+(items[i].name||"item"));});
+   snaps.forEach((ps,i)=>{const field=ps.data().stock!==undefined?"stock":"quantity";tx.update(refs[i],{[field]:Number(ps.data()[field])-Number(items[i].quantity||0)});});
+   tx.update(ref,{status:newStatus,stockDeducted:true,stockRestored:false,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  }else if(newStatus==="Cancelled"&&o.stockDeducted&&!o.stockRestored){
+   const refs=items.map(i=>db.collection("products").doc(i.productId||"__missing__")),snaps=[];
+   for(const r of refs)snaps.push(await tx.get(r));
+   snaps.forEach((ps,i)=>{if(!ps.exists)throw new Error("Cannot restore stock; product missing: "+items[i].name)});
+   snaps.forEach((ps,i)=>{const field=ps.data().stock!==undefined?"stock":"quantity";tx.update(refs[i],{[field]:Number(ps.data()[field]||0)+Number(items[i].quantity||0)});});
+   tx.update(ref,{status:newStatus,stockRestored:true,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  }else tx.update(ref,{status:newStatus,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+ });
+}
+function renderCancellations(){
+ const list=cancellations.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+ $("cancellationList").innerHTML=list.length?list.map(c=>`<div class="request-card"><b>Request for order ${esc(c.orderId||"—")}</b><p class="muted">Reason: ${esc(c.reason||"Not provided")}<br>Customer UID: ${esc(c.customerUid||"—")}<br>Status: ${esc(c.status||"Requested")}<br>Created: ${esc(stamp(c.createdAt))}</p>${(c.status==="Requested"||c.status==="Pending")?`<button class="success" data-approve="${esc(c.id)}">Approve</button> <button class="secondary" data-reject="${esc(c.id)}">Reject</button>`:""}</div>`).join(""):'<div class="empty">No cancellation requests.</div>';
+}
+$("cancellationList").addEventListener("click",async e=>{
+ const yes=e.target.closest("[data-approve]"),no=e.target.closest("[data-reject]");if(!yes&&!no)return;
+ const id=(yes||no).dataset.approve||(yes||no).dataset.reject,c=cancellations.find(x=>x.id===id);if(!c)return;
+ try{
+  if(yes){const orderSnap=await db.collection("orders").doc(c.orderId).get();if(!orderSnap.exists||orderSnap.data().customerUid!==c.customerUid)throw new Error("Request does not match the order owner.");await updateOrderStatus(c.orderId,"Cancelled");await db.collection("cancellationRequests").doc(id).update({status:"Approved",reviewedAt:firebase.firestore.FieldValue.serverTimestamp()})}
+  else await db.collection("cancellationRequests").doc(id).update({status:"Rejected",reviewedAt:firebase.firestore.FieldValue.serverTimestamp()});
+ }catch(err){alert("Could not process request: "+err.message)}
+});
+function renderCustomers(){
+ const map=new Map();orders.forEach(o=>{const k=o.customerUid||o.phone||o.customerName||"unknown",v=map.get(k)||{name:o.customerName||"Unknown",phone:o.phone||"—",address:o.address||"—",count:0,total:0};v.count++;v.total+=Number(o.total||0);map.set(k,v)});
+ const rows=[...map.values()].sort((a,b)=>b.total-a.total);
+ $("customerList").innerHTML=rows.length?`<div class="tablewrap"><table><thead><tr><th>Customer</th><th>Phone</th><th>Orders</th><th>Order value</th><th>Latest address</th></tr></thead><tbody>${rows.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${c.count}</td><td>${money(c.total)}</td><td>${esc(c.address)}</td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">No customer orders yet.</div>';
+}
+})();
+</script>
+</body>
+</html>
